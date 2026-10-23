@@ -98,13 +98,13 @@
 ### День 2 — Gradle, модули и первые модели
 
 - Модуль появляется только после `include(":core:ui")` в `settings.gradle.kts`: папка и `build.gradle.kts` без строки в settings для Gradle не существуют.
-- Двоеточие — это вложенность папок: `domain/medications/api` → `:domain:medications:api`. Промежуточные папки модулями не становятся, build-файл в них не нужен.
-- Держи каркас минимальным: `:core:ui` (тема и токены) и `:domain:medications:api` (чистый Kotlin). Полный скелет сразу — только мешает.
-- Модели пиши сразу в `domain`, а не в `app`: `data class Medication`, `sealed interface MedicationUiState`. Тогда их не придётся переносить на второй неделе.
+- Двоеточие — это вложенность папок: `domain/api` → `:domain:api`. Промежуточные папки модулями не становятся, build-файл в них не нужен.
+- Держи каркас минимальным: `:core:ui` (тема и токены) и `:domain:api` (чистый Kotlin). Полный скелет сразу — только мешает.
+- Модели пиши сразу в `domain`, а не в `app`: `Medication`, `Dose`, `MedicationSchedule`. Тогда их не придётся переносить на второй неделе.
 - `data class` бесплатно даёт `equals`/`hashCode`/`copy` — на этом держится перерисовка Compose и `distinctUntilChanged` в `Flow`. Модели — неизменяемые.
-- `sealed interface` под `UiState`: `when` заставит обработать все варианты, компилятор не даст забыть.
+- `MedicationUiState` пока не нужен: это состояние экрана, а не доменная модель. Оно появится на дне 6 вместе с ViewModel.
 
-**Ориентир:** модули `:core:ui` и `:domain:medications:api` зарегистрированы в `settings.gradle.kts` и собираются; тема переехала в `:core:ui`; в `domain` лежат `Medication` и `sealed interface MedicationUiState` с `Loading`/`Empty`/`Content`/`Error`, а `:app` зависит от обоих модулей.
+**Ориентир:** модули `:core:ui` и `:domain:api` зарегистрированы в `settings.gradle.kts` и собираются; тема переехала в `:core:ui`; в `:domain:api` лежат `Medication`, `Dose`, `DoseUnit`, `MedicationSchedule`, `MedicationTime`, а `:app` зависит от обоих модулей.
 
 **📚 Куда смотреть:** [Как подключить новый модуль](#architecture) · [Gradle: java-library и api](https://docs.gradle.org/current/userguide/java_library_plugin.html) · [METANIT: Kotlin](https://metanit.com/kotlin/)
 
@@ -166,7 +166,7 @@
 
 > 💡 Не пытайся идеально изучить весь Kotlin. На каждый новый концепт делай небольшой пример прямо в проекте.
 
-**Итог недели 1:** приложение с четырьмя экранами (главный, список лекарств, форма добавления, настройки сна), данные живут в памяти, навигация работает; с первого дня подняты модули `:core:ui` и `:domain:medications:api`, тема и модели живут там, а не в `app`.
+**Итог недели 1:** приложение с четырьмя экранами (главный, список лекарств, форма добавления, настройки сна), данные живут в памяти, навигация работает; с первого дня подняты модули `:core:ui` и `:domain:api`, тема и модели живут там, а не в `app`.
 
 ---
 
@@ -180,7 +180,7 @@
 | [8](#day-8) | Room: Entity, DAO, Database |
 | [9](#day-9) | CRUD и Flow из Room |
 | [10](#day-10) | MVVM, Repository, Use Case |
-| [11](#day-11) | Модуль реализации `:data:medications:impl` |
+| [11](#day-11) | Модуль реализации `:data:impl` |
 | [12](#day-12) | Gradle Kotlin DSL: `api` vs `implementation` |
 | [13](#day-13) | Hilt и DI |
 | [14](#day-14) | Миграции и тесты DAO |
@@ -210,22 +210,22 @@
 ### День 10 — MVVM, Repository, Use Case
 
 - Repository — интерфейс в domain, реализация в data: это и есть точка замены хранилища.
-- Контракт `MedicationRepository` клади сразу в `:domain:medications:api` — модуль у тебя есть с недели 1. Реализация пока может жить рядом с Room в `app`.
+- Контракт `MedicationRepository` клади сразу в `:domain:api` — модуль у тебя есть с недели 1. Реализация пока может жить рядом с Room в `app`.
 - UseCase — когда логика переиспользуется или тестируется отдельно; зависимости — только через конструктор.
 - Мапперы entity ↔ domain не дают базе протечь в UI.
 
-**Ориентир:** `MedicationRepository` — интерфейс в `:domain:medications:api`, реализация — рядом с Room; ViewModel не знает про `MedicationDao`.
+**Ориентир:** `MedicationRepository` — интерфейс в `:domain:api`, реализация — рядом с Room; ViewModel не знает про `MedicationDao`.
 
 **📚 Куда смотреть:** [Architecture](https://developer.android.com/topic/architecture?hl=ru) · [Start Android: Architecture Components](https://startandroid.ru/)
 
 <a id="day-11"></a>
-### День 11 — Модуль реализации `:data:medications:impl`
+### День 11 — Модуль реализации `:data:impl`
 
 - `api`-модуль уже создан на неделе 1, поэтому здесь появляется второй слой — модуль реализации.
-- Зарегистрируй его в `settings.gradle.kts` и подключи в `app`; реализация зависит от `:domain:medications:api` и `:core:database`.
+- Зарегистрируй его в `settings.gradle.kts` и подключи в `app`; реализация зависит от `:domain:api` и `:core:database`.
 - Выноси постепенно, проверяя сборку после каждого шага: большой перенос в один заход почти всегда ломается.
 
-**Ориентир:** `:data:medications:impl` в `settings.gradle.kts`; `MedicationRepositoryImpl` живёт там, `feature:medications` по-прежнему зависит только от `:domain:medications:api`.
+**Ориентир:** `:data:impl` в `settings.gradle.kts`; `MedicationRepositoryImpl` живёт там, `feature:medications` по-прежнему зависит только от `:domain:api`.
 
 **📚 Куда смотреть:** [Модуляризация](https://developer.android.com/topic/architecture?hl=ru) · [Start Android](https://startandroid.ru/)
 
@@ -234,7 +234,7 @@
 
 - `implementation` по умолчанию; `api` — только если тип из зависимости виден в публичных сигнатурах.
 - `implementation(project(":x"))` даёт классы `:x`, но **не** его зависимости — это главная путаница.
-- `./gradlew :data:medications:impl:dependencies` показывает граф; версии Kotlin/Compose/AGP — одни на проект.
+- `./gradlew :data:impl:dependencies` показывает граф; версии Kotlin/Compose/AGP — одни на проект.
 
 Подробный разбор с примерами — в [ADR-3](#adr-3).
 
@@ -262,11 +262,11 @@
 
 **📚 Куда смотреть:** [Room](https://developer.android.com/training/data-storage/room?hl=ru) · [Start Android: тестирование](https://startandroid.ru/)
 
-> 💡 Не создавай все возможные модули сразу. `:core:ui` и `:domain:medications:api` уже есть с недели 1 — на второй неделе добавь к ним `:core:database` и `:data:medications:impl`, то есть один полноценный вертикальный срез.
+> 💡 Не создавай все возможные модули сразу. `:core:ui` и `:domain:api` уже есть с недели 1 — на второй неделе добавь к ним `:core:database` и `:data:impl`, то есть один полноценный вертикальный срез.
 
 > 💡 **Роль Room после подключения Firebase.** Firestore умеет офлайн-кэш из коробки, но Room остаётся удобнее для двух задач: быстрых запросов под расписание напоминаний и явной модели данных в domain-слое. Поэтому Room проектируем как локальный кэш впереди Firestore, а не как единственный источник правды.
 
-**Итог недели 2:** лекарства сохраняются в Room между запусками; добавились `:core:database` и `:data:medications:impl`, контракт остаётся в `:domain:medications:api`; Hilt связывает репозиторий, миграция и тест DAO зелёные.
+**Итог недели 2:** лекарства сохраняются в Room между запусками; добавились `:core:database` и `:data:impl`, контракт остаётся в `:domain:api`; Hilt связывает репозиторий, миграция и тест DAO зелёные.
 
 ---
 
@@ -502,13 +502,15 @@
 Здесь собраны решения, которые стоит принять **до** того, как проект разрастётся. Каждое можно пересмотреть, но лучше делать это осознанно.
 
 <a id="adr-1"></a>
-### ADR-1. Вертикальные срезы, а не горизонтальные слои
+### ADR-1. Один доменный слой и один слой реализации
 
-- Каждая фича — это срез из трёх частей: `:domain:<name>:api` (контракт), `:data:<name>:impl` (реализация), `:feature:<name>` (UI).
-- `:core:*` — общие технические модули без бизнес-логики фич.
+- На MVP — два общих слоя: `:domain:api` (модели, контракты, use cases, чистая логика) и `:data:impl` (реализации: Room, Firestore, Retrofit). Это не «модуль на каждую фичу», а один срез на всё приложение.
+- `:feature:<name>` — по модулю на экранную область: `home`, `medications`, `auth`.
+- `:core:*` — общие технические модули без бизнес-логики: `ui`, `database`, `firebase`, `network`.
+- Срез на фичу (`:domain:wellness:api` + `:data:wellness:impl`) появляется, когда у неё есть своя граница: отдельный источник данных, отдельная команда или тяжёлые зависимости.
 - Не выноси каждый класс в модуль: модуль нужен там, где есть реальная граница.
 
-**Почему:** срез `medications` можно менять целиком, не задевая `wellness`, `auth` и их UI.
+**Почему:** 10 модулей читаются и собираются быстрее, чем 23, а направление зависимостей остаётся тем же, что в «большой» Clean Architecture. Переход к срезам по фичам потом не ломает UI — контракты уже отделены от реализаций.
 
 <a id="adr-2"></a>
 ### ADR-2. Направление зависимостей
@@ -516,15 +518,15 @@
 Стрелка `A → B` означает «A зависит от B».
 
 ```text
-:app → :feature:*            (собирает граф)
-:feature:* → :domain:*:api   (UI знает только контракт)
-:data:*:impl → :domain:*:api + :core:*   (реализация знает контракт и инфраструктуру)
-:app → :data:*:impl          (единственное место, где impl попадает в сборку)
+:app → :feature:*                  (собирает граф)
+:feature:* → :domain:api           (UI знает только контракты)
+:data:impl → :domain:api + :core:* (реализация знает контракт и инфраструктуру)
+:app → :data:impl                  (единственное место, где impl попадает в сборку)
 ```
 
 **Запрещено:**
-- `:domain:*` не зависит от `:data:*`, Android, Room, Firebase и Retrofit.
-- `:feature:*` не зависит от `:data:*:impl` напрямую.
+- `:domain:api` не зависит от `:data:impl`, Android, Room, Firebase и Retrofit.
+- `:feature:*` не зависит от `:data:impl` напрямую.
 - `:core:*` не зависит от `:feature:*`.
 - Никто не зависит от `:app`.
 
@@ -546,18 +548,17 @@
 
 | Модуль | Что в публичной сигнатуре | `api(...)` | `implementation(...)` |
 | --- | --- | --- | --- |
-| `:domain:medications:api` | `Flow<List<Medication>>` в контракте | `kotlinx-coroutines-core` | — |
-| `:domain:wellness:api` | `Flow<HealthIndex>`, `HealthIndex` | `kotlinx-coroutines-core` | — |
-| `:data:medications:impl` | ничего (скрыто за интерфейсом) | — | `:domain:medications:api`, `:core:database`, `:core:firebase`, `firebase-firestore`, `room-*`, `hilt-android` |
+| `:domain:api` | `Flow<List<Medication>>`, `Flow<HealthIndex>` в контрактах | `kotlinx-coroutines-core` | — |
+| `:data:impl` | ничего (скрыто за интерфейсами) | — | `:domain:api`, `:core:database`, `:core:firebase`, `:core:network`, `firebase-firestore`, `room-*`, `hilt-android` |
 | `:core:network` | свои `WeatherApi` и DTO | — | `retrofit`, `okhttp`, `logging-interceptor`, конвертер, `kotlinx-serialization-json` |
 | `:core:firebase` | — | — | `firebase-firestore`, `firebase-auth` |
-| `:feature:home` | Composable без domain-типов | — | `:domain:wellness:api`, Compose, Navigation |
-| `:app` | — | — | все `:feature:*`, все `:data:*:impl`, `:domain:*:api` |
+| `:feature:home` | Composable без domain-типов | — | `:domain:api`, Compose, Navigation |
+| `:app` | — | — | все `:feature:*`, `:data:impl`, `:domain:api` |
 
 **Пример: доменный модуль.** Контракт возвращает `Flow`, значит `Flow` должен быть доступен потребителю — используем `api`:
 
 ```kotlin
-// :domain:medications:api/build.gradle.kts
+// :domain:api/build.gradle.kts
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-library")   // именно java-library добавляет конфигурацию api
@@ -573,7 +574,7 @@ dependencies {
 **Пример: модуль реализации.** Наружу торчит только интерфейс, реализация скрыта — везде `implementation`:
 
 ```kotlin
-// :data:medications:impl/build.gradle.kts
+// :data:impl/build.gradle.kts
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -581,10 +582,10 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-android { namespace = "com.example.Dayly.data.medications.impl" }
+android { namespace = "com.denalal.dayly.data.impl" }
 
 dependencies {
-    implementation(project(":domain:medications:api"))
+    implementation(project(":domain:api"))
     implementation(project(":core:database"))
     implementation(project(":core:firebase"))
 
@@ -609,7 +610,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
-android { namespace = "com.example.Dayly.core.network" }
+android { namespace = "com.denalal.dayly.core.network" }
 
 dependencies {
     // Retrofit не появляется в наших публичных сигнатурах → implementation
@@ -628,7 +629,7 @@ dependencies {
 <a id="adr-4"></a>
 ### ADR-4. Доменные модули — чистый Kotlin без Android
 
-- `:domain:*:api` собираются плагином `org.jetbrains.kotlin.jvm`, а не Android-плагином.
+- `:domain:api` собираются плагином `org.jetbrains.kotlin.jvm`, а не Android-плагином.
 - Никаких `Context`, `R`, `androidx` внутри domain.
 
 **Почему:** тесты domain идут на JVM за миллисекунды, а архитектура остаётся честной. Нужно ли это на старте — вопрос, но переезжать потом больнее. Если хочется проще, можно сделать все модули `com.android.library`; `api` доступен и там.
@@ -646,15 +647,15 @@ dependencies {
 ### ADR-6. Внешние данные изолированы
 
 - `:core:network` — только транспорт: Retrofit, OkHttp, конвертеры. Никакой бизнес-логики.
-- `:data:wellness:impl` — маппинг, оркестрация запросов, кэш.
-- `:domain:wellness:api` — модели и **чистая** логика (`HealthIndexCalculator`).
+- `:data:impl` — маппинг, оркестрация запросов, кэш.
+- `:domain:api` — модели и **чистая** логика (`HealthIndexCalculator`).
 
 **Почему:** замена Open-Meteo на другой источник — правка одного модуля; UI и расчёт не меняются.
 
 <a id="adr-7"></a>
 ### ADR-7. DI-связывание живёт в модуле реализации
 
-- `@Binds` для «интерфейс → реализация» объявляй в `:data:*:impl`, а не в `:app` и не в `:domain`.
+- `@Binds` для «интерфейс → реализация» объявляй в `:data:impl`, а не в `:app` и не в `:domain`.
 - `@Provides` — для внешних типов: `Retrofit`, `OkHttpClient`, `FirebaseFirestore`, `FirebaseAuth`.
 - `:app` про реализации ничего не знает, кроме строки в Gradle.
 
@@ -674,8 +675,8 @@ dependencies {
 
 | Слой | Что тестируем | Чем |
 | --- | --- | --- |
-| `:domain:*` | расчёты, use cases | чистые JVM-тесты |
-| `:data:*:impl` | мапперы, репозиторий | MockK, Firebase Emulator Suite |
+| `:domain:api` | расчёты, use cases | чистые JVM-тесты |
+| `:data:impl` | мапперы, репозиторий | MockK, Firebase Emulator Suite |
 | `:core:network` | сервисы, ошибки | MockWebServer |
 | `:feature:*` | ViewModel и UI | JUnit + Compose UI Test |
 | `:app` | сценарий целиком | ручной прогон |
@@ -745,50 +746,29 @@ dependencies {
 
 ```text
 Dayly/
-├── app/
+├── app/                    # граф, тема, навигация, уведомления
 │
 ├── core/
-│   ├── common/
 │   ├── ui/                # дизайн-система: токены, тема, компоненты
 │   ├── database/          # Room: локальный кэш и расписания напоминаний
-│   ├── network/           # Retrofit + OkHttp: внешний REST API
 │   ├── firebase/          # Firestore и Firebase Authentication
-│   └── notifications/
+│   └── network/           # Retrofit + OkHttp: внешний REST API
 │
 ├── domain/
-│   ├── auth/
-│   │   └── api/
-│   ├── wellness/          # погода, качество воздуха и индекс самочувствия
-│   │   └── api/
-│   ├── medications/
-│   │   └── api/
-│   ├── habits/
-│   │   └── api/
-│   └── sleep/
-│       └── api/
+│   └── api/               # модели, контракты, use cases, HealthIndexCalculator
 │
 ├── data/
-│   ├── auth/
-│   │   └── impl/
-│   ├── wellness/
-│   │   └── impl/
-│   ├── medications/
-│   │   └── impl/
-│   ├── habits/
-│   │   └── impl/
-│   └── sleep/
-│       └── impl/
+│   └── impl/              # реализации репозиториев: Room, Firestore, Retrofit
 │
 └── feature/
-    ├── auth/
-    ├── home/
-    ├── medications/
-    ├── habits/
-    ├── sleep/
-    └── settings/
+    ├── home/              # главный экран, сон, индекс самочувствия
+    ├── medications/       # список и форма добавления
+    └── auth/              # вход и регистрация
 ```
 
-> 💡 Каждая папка с `build.gradle.kts` — отдельный Gradle-модуль.
+> 💡 Это **10 модулей**, а не 23. Каждая папка с `build.gradle.kts` — отдельный Gradle-модуль; группы `core`, `domain`, `data`, `feature` модулями не являются.
+>
+> 💡 `habits` и `sleep` на MVP живут внутри `:feature:home`: отдельный модуль появляется, когда у фичи возникает своя граница (свой data-слой, своя команда, тяжёлые зависимости). Вынести позже — дешевле, чем тащить 15 пустых модулей с первого дня.
 
 ### Как будут связаны модули
 
@@ -796,20 +776,188 @@ Dayly/
                         :app
          +---------------+--------------+
          |               |              |
- :feature:auth   :feature:home   :feature:medications
+  :feature:auth   :feature:home  :feature:medications
          |               |              |
-         v               v              v
- :domain:auth:api :domain:wellness:api :domain:medications:api
-         ^               ^              ^
-         |               |              |
- :data:auth:impl :data:wellness:impl :data:medications:impl
-         |               |              |
-         v               v              v
-   :core:firebase   :core:network  :core:database
-                                     :core:firebase
+         +---------------+--------------+
+                         |
+                    :domain:api
+                         ^
+                         |
+                     :data:impl
+                    /     |      \
+          :core:database :core:firebase :core:network
 ```
 
 Подробнее о направлении стрелок и запретах — в [ADR-2](#adr-2), о том, что писать в `api`, а что в `implementation`, — в [ADR-3](#adr-3).
+
+### Структура до файлов
+
+Полный скелет. Подробно расписан срез лекарств, остальные фичи — на уровне пакетов: принцип тот же.
+
+```text
+Dayly/
+├── app/
+│   ├── build.gradle.kts
+│   └── src/main/
+│       ├── AndroidManifest.xml
+│       ├── java/com/denalal/dayly/
+│       │   ├── DaylyApplication.kt          # @HiltAndroidApp
+│       │   ├── MainActivity.kt              # DaylyTheme { DaylyApp() }
+│       │   ├── navigation/
+│       │   │   ├── DaylyApp.kt              # Scaffold + NavHost
+│       │   │   └── DaylyNavHost.kt          # собирает граф из фич
+│       │   └── notifications/
+│       │       ├── ReminderScheduler.kt     # AlarmManager: plan/cancel
+│       │       ├── ReminderReceiver.kt      # показывает уведомление
+│       │       ├── BootReceiver.kt          # BOOT_COMPLETED
+│       │       └── NotificationChannels.kt
+│       └── res/values/strings.xml
+│
+├── core/
+│   ├── ui/
+│   │   └── src/main/java/com/denalal/dayly/core/ui/
+│   │       ├── theme/
+│   │       │   ├── DaylyTheme.kt
+│   │       │   ├── Color.kt
+│   │       │   ├── Type.kt
+│   │       │   └── Spacing.kt
+│   │       └── component/
+│   │           ├── DaylyCard.kt
+│   │           ├── DaylyButton.kt
+│   │           ├── DaylyTextField.kt
+│   │           ├── DaylyTopBar.kt
+│   │           └── StateViews.kt            # Loading / Empty / Error
+│   │
+│   ├── database/
+│   │   └── src/main/java/com/denalal/dayly/core/database/
+│   │       ├── DaylyDatabase.kt             # @Database
+│   │       ├── Converters.kt
+│   │       ├── medication/
+│   │       │   ├── MedicationEntity.kt
+│   │       │   └── MedicationDao.kt
+│   │       └── wellness/
+│   │           ├── HealthIndexEntity.kt
+│   │           └── WellnessDao.kt
+│   │
+│   ├── firebase/
+│   │   └── src/main/java/com/denalal/dayly/core/firebase/
+│   │       ├── FirestorePaths.kt            # users/{uid}/medications/...
+│   │       └── FirebaseModule.kt            # @Provides Firestore / Auth
+│   │
+│   └── network/
+│       └── src/main/java/com/denalal/dayly/core/network/
+│           ├── HttpClientFactory.kt         # OkHttp + Retrofit
+│           ├── WeatherApi.kt
+│           ├── AirQualityApi.kt
+│           └── dto/
+│               ├── WeatherDto.kt
+│               └── AirQualityDto.kt
+│
+├── domain/
+│   └── api/
+│       └── src/main/kotlin/com/denalal/dayly/domain/
+│           ├── medication/
+│           │   ├── Medication.kt
+│           │   ├── MedicationSchedule.kt
+│           │   ├── MedicationRepository.kt
+│           │   └── usecase/
+│           │       ├── ObserveMedicationsUseCase.kt
+│           │       ├── AddMedicationUseCase.kt
+│           │       └── MarkMedicationTakenUseCase.kt
+│           ├── auth/
+│           │   ├── User.kt
+│           │   └── AuthRepository.kt
+│           └── wellness/
+│               ├── HealthIndex.kt
+│               ├── HealthFactor.kt
+│               ├── WeatherSnapshot.kt
+│               ├── AirQualitySnapshot.kt
+│               ├── HealthIndexCalculator.kt
+│               └── WellnessRepository.kt
+│
+├── data/
+│   └── impl/
+│       └── src/main/java/com/denalal/dayly/data/
+│           ├── medication/
+│           │   ├── MedicationRepositoryImpl.kt
+│           │   ├── local/
+│           │   │   └── MedicationMapper.kt
+│           │   └── remote/
+│           │       ├── MedicationDocument.kt
+│           │       └── FirestoreMedicationSource.kt
+│           ├── auth/
+│           │   ├── AuthRepositoryImpl.kt
+│           │   └── FirebaseAuthSource.kt
+│           ├── wellness/
+│           │   ├── WellnessRepositoryImpl.kt
+│           │   ├── HealthIndexCalculatorImpl.kt
+│           │   └── WeatherMapper.kt
+│           └── di/
+│               ├── DatabaseModule.kt
+│               └── RepositoryModule.kt
+│
+└── feature/
+    ├── medications/
+    │   └── src/main/java/com/denalal/dayly/feature/medications/
+    │       ├── navigation/
+    │       │   ├── MedicationsRoutes.kt     # @Serializable маршруты
+    │       │   └── MedicationsGraph.kt      # NavGraphBuilder-расширение
+    │       ├── list/
+    │       │   ├── MedicationsScreen.kt
+    │       │   ├── MedicationsViewModel.kt
+    │       │   └── MedicationsUiState.kt
+    │       └── add/
+    │           ├── AddMedicationScreen.kt
+    │           ├── AddMedicationViewModel.kt
+    │           └── AddMedicationUiState.kt
+    │
+    ├── home/
+    │   └── src/main/java/com/denalal/dayly/feature/home/
+    │       ├── navigation/HomeRoutes.kt
+    │       ├── HomeScreen.kt
+    │       ├── HomeViewModel.kt
+    │       ├── HomeUiState.kt
+    │       └── HealthIndexCard.kt
+    │
+    └── auth/
+        └── src/main/java/com/denalal/dayly/feature/auth/
+            ├── navigation/AuthRoutes.kt
+            ├── login/
+            │   ├── LoginScreen.kt
+            │   └── LoginViewModel.kt
+            └── register/
+                ├── RegisterScreen.kt
+                └── RegisterViewModel.kt
+```
+
+**Кто за что отвечает в срезе лекарств:**
+
+| Файл | Роль |
+| --- | --- |
+| `domain/.../medication/Medication.kt` | доменная модель: `id`, `name`, `dose`, `times` |
+| `domain/.../medication/MedicationRepository.kt` | контракт: `observeAll`, `add`, `markAsTaken` |
+| `domain/.../usecase/*` | сценарии: один файл — одно действие |
+| `core/database/.../MedicationEntity.kt` | таблица Room |
+| `core/database/.../MedicationDao.kt` | SQL и `Flow`-запросы |
+| `data/impl/.../local/MedicationMapper.kt` | `Entity` ↔ `Medication` |
+| `data/impl/.../remote/FirestoreMedicationSource.kt` | Firestore: `snapshots()`, `set`, `update` |
+| `data/impl/.../MedicationRepositoryImpl.kt` | оркестрация: Room как кэш + Firestore как источник правды |
+| `data/impl/.../di/RepositoryModule.kt` | `@Binds` интерфейс → реализация |
+| `feature/.../navigation/MedicationsRoutes.kt` | типизированные маршруты: `Medications`, `MedicationDetails(id)` |
+| `feature/.../list/MedicationsViewModel.kt` | `StateFlow<MedicationsUiState>` и вызов use cases |
+| `feature/.../list/MedicationsScreen.kt` | только UI: собирает компоненты из `:core:ui` |
+| `app/.../navigation/DaylyNavHost.kt` | связывает все фичи и передаёт лямбды переходов |
+
+**Правила именования и размещения**
+
+- `*Screen` — Composable-экран, `*ViewModel` — состояние и логика, `*UiState` — `sealed interface` состояния.
+- `*Entity` / `*Dao` — только в `:core:database`; `*Dto` — только в `:core:network`; `*Document` — только в `:data:impl` (Firestore-документ).
+- `*Repository` (интерфейс) — в `:domain:api`, `*RepositoryImpl` — в `:data:impl`; `*UseCase` — в `:domain:api`.
+- `*Source` — тонкая обёртка над внешним API (Firestore, Auth), живёт в `:data:impl`.
+- Тесты повторяют пакеты: `src/test/java/com/denalal/dayly/...`, UI-тесты — `src/androidTest/...`.
+- Android-модули держи `src/main/java`, чистый Kotlin-модуль — `src/main/kotlin`. На компиляцию это не влияет, но так принято в Android Studio.
+
+> 💡 **Куда положить новый файл?** Если это модель или контракт — `:domain:api`. Если работа с базой, сетью или Firebase — `:data:impl` (или соответствующий `:core:*`, если это инфраструктура). Если это экран или ViewModel — в `:feature:<name>`. Если переиспользуемая кнопка или цвет — `:core:ui`.
 
 **Например, публичные контракты:**
 
@@ -900,16 +1048,14 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
 
-    implementation(project(":data:medications:impl"))
-    implementation(project(":data:auth:impl"))
-    implementation(project(":data:wellness:impl"))
+    implementation(project(":data:impl"))
 
     // Доменные контракты — явно, если :app их использует напрямую.
-    implementation(project(":domain:medications:api"))
+    implementation(project(":domain:api"))
 }
 ```
 
-> 💡 `feature:home` зависит от `domain:wellness:api`, а не от Retrofit-сервиса. Заменишь Open-Meteo на другой источник — UI не изменится, потому что индекс самочувствия останется той же моделью.
+> 💡 `feature:home` зависит от `domain:api`, а не от Retrofit-сервиса. Заменишь Open-Meteo на другой источник — UI не изменится, потому что индекс самочувствия останется той же моделью.
 
 ### Как подключить новый модуль
 
@@ -923,8 +1069,8 @@ dependencies {
 
 **Правила путей**
 
-- Двоеточие в `include` — это вложенность папок: `domain/medications/api` → `:domain:medications:api`.
-- Промежуточные папки (`domain`, `domain/medications`) модулями не становятся: `build.gradle.kts` в них не нужен.
+- Двоеточие в `include` — это вложенность папок: `domain/api` → `:domain:api`.
+- Промежуточные папки (`core`, `domain`, `data`, `feature`) модулями не становятся: `build.gradle.kts` в них не нужен.
 - Имя папки должно совпадать с последним сегментом пути (иначе `projectDir` придётся задавать вручную).
 
 ```kotlin
@@ -936,8 +1082,8 @@ include(":app")
 include(":core:ui")
 include(":core:database")
 
-include(":domain:medications:api")
-include(":data:medications:impl")
+include(":domain:api")
+include(":data:impl")
 include(":feature:medications")
 ```
 
@@ -962,7 +1108,7 @@ dependencies {
 }
 ```
 
-**Чистый Kotlin-модуль** — например `domain/medications/api/build.gradle.kts`. Здесь нет `android { }`, зато доступна конфигурация `api` (см. [ADR-3](#adr-3)):
+**Чистый Kotlin-модуль** — например `domain/api/build.gradle.kts`. Здесь нет `android { }`, зато доступна конфигурация `api` (см. [ADR-3](#adr-3)):
 
 ```kotlin
 plugins {
@@ -981,7 +1127,7 @@ dependencies {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":feature:medications"))
-    implementation(project(":data:medications:impl"))
+    implementation(project(":data:impl"))
 }
 ```
 
@@ -1207,11 +1353,11 @@ dependencies {
     implementation(project(":feature:auth"))
     implementation(project(":feature:home"))
 
-    implementation(project(":data:medications:impl"))
-    implementation(project(":data:auth:impl"))
-    implementation(project(":data:wellness:impl"))
+    implementation(project(":data:impl"))
+    implementation(project(":data:impl"))
+    implementation(project(":data:impl"))
 
-    implementation(project(":domain:medications:api"))
+    implementation(project(":domain:api"))
 }
 ```
 

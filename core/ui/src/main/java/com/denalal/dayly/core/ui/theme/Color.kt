@@ -1,4 +1,4 @@
-package com.denalal.dayly.ui.theme
+package com.denalal.dayly.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

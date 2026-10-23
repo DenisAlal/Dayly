@@ -24,3 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Dayly"
 include(":app")
+
+include(":core:ui")
+include(":domain:api")
