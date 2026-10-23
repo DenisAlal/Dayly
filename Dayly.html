@@ -1,0 +1,1772 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dayly — план разработки на 4 недели</title>
+<style>
+  :root { --fg:#1f2328; --muted:#59636e; --line:#d1d9e0; --bg:#ffffff; --accent:#0969da; --code:#f6f8fa; --nav-w:330px; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; color:var(--fg); background:var(--bg);
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         font-size: 15px; line-height: 1.6; }
+  #layout { display:flex; align-items:flex-start; }
+
+  nav#toc { position:sticky; top:0; flex:0 0 auto; width:var(--nav-w); height:100vh;
+            display:flex; flex-direction:column; overflow:hidden;
+            border-right:1px solid var(--line); background:#fbfcfd;
+            transition: width .16s ease; }
+  .toc-head { flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+              gap:8px; padding:14px 10px 8px 14px; }
+  .toc-head .toc-title { font-weight:700; font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); }
+  .toc-head button, #expand {
+    font: inherit; font-size:14px; line-height:1; cursor:pointer; color:var(--muted);
+    background:#fff; border:1px solid var(--line); border-radius:8px; padding:5px 9px; }
+  .toc-head button:hover, #expand:hover { color:var(--accent); border-color:#b6c2cd; background:#f3f7fb; }
+  .toc-list { flex:1 1 auto; overflow:auto; padding:0 12px 40px; }
+  .toc-list a { display:block; text-decoration:none; color:var(--fg); padding:2px 6px; border-radius:6px; }
+  .toc-list a:hover { background:#eef2f6; color:var(--accent); }
+  .toc-list a.active { background:#e7f0fa; color:var(--accent); font-weight:600; }
+  .toc-list a.l2 { font-weight:600; margin-top:10px; }
+  .toc-list a.l3 { padding-left:18px; font-size:13.5px; color:var(--muted); }
+
+  #grip { position:absolute; top:0; right:0; width:6px; height:100%; cursor:col-resize; }
+  #grip:hover { background:#dde5ec; }
+
+  #expand { display:none; position:fixed; top:14px; left:14px; z-index:20; }
+
+  body.nav-collapsed nav#toc { width:0 !important; border-right:0; }
+  body.nav-collapsed nav#toc .toc-head, body.nav-collapsed nav#toc .toc-list { display:none; }
+  body.nav-collapsed #expand { display:inline-block; }
+
+  main { flex:1 1 auto; min-width:0; max-width:1000px; padding:28px 44px 120px; }
+  h1,h2,h3,h4 { line-height:1.25; scroll-margin-top:16px; }
+  h1 { font-size:27px; margin:0 0 16px; }
+  h2 { font-size:22px; margin:34px 0 12px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  h3 { font-size:17px; margin:24px 0 8px; }
+  h4 { font-size:15px; margin:18px 0 6px; }
+  a { color:var(--accent); }
+  code { background:var(--code); padding:.15em .35em; border-radius:5px; font-size:12.8px;
+         font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+  pre { background:var(--code); padding:12px 14px; border-radius:8px; overflow:auto; border:1px solid var(--line); }
+  pre code { background:none; padding:0; font-size:12.6px; }
+  table { border-collapse:collapse; width:100%; margin:12px 0; font-size:14px; }
+  th,td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+  th { background:#f6f8fa; }
+  blockquote { margin:12px 0; padding:2px 14px; border-left:4px solid var(--line); color:var(--muted); }
+  blockquote p { margin:6px 0; }
+  hr { border:0; border-top:1px solid var(--line); margin:26px 0; }
+  ul,ol { padding-left:22px; }
+  li { margin:3px 0; }
+  input[type=checkbox] { margin-right:6px; }
+
+  @media (max-width: 900px) {
+    #layout { display:block; }
+    nav#toc { position:static; height:auto; width:auto; }
+    .toc-list { max-height:40vh; }
+  }
+</style>
+</head>
+<body>
+<div id="layout">
+<nav id="toc">
+  <div class="toc-head">
+    <span class="toc-title">Содержание</span>
+    <button id="collapse" title="Свернуть содержание" aria-label="Свернуть содержание">«</button>
+  </div>
+  <div class="toc-list">
+<a class="l2" href="#overview">Обзор четырёх недель</a>
+<a class="l2" href="#week-1">Неделя 1. Kotlin и Compose</a>
+<a class="l3" href="#day-1">День 1 — Настройка окружения и базовый Kotlin</a>
+<a class="l3" href="#day-2">День 2 — Gradle, модули и первые модели</a>
+<a class="l3" href="#day-3">День 3 — Коллекции, generics, расширения</a>
+<a class="l3" href="#day-4">День 4 — Корутины и Flow</a>
+<a class="l3" href="#day-5">День 5 — Основы Compose и дизайн-система</a>
+<a class="l3" href="#day-6">День 6 — Состояние и ViewModel</a>
+<a class="l3" href="#day-7">День 7 — Навигация: типизированные маршруты</a>
+<a class="l2" href="#week-2">Неделя 2. Room, архитектура и Gradle</a>
+<a class="l3" href="#day-8">День 8 — Room: Entity, DAO, Database</a>
+<a class="l3" href="#day-9">День 9 — CRUD и Flow из Room</a>
+<a class="l3" href="#day-10">День 10 — MVVM, Repository, Use Case</a>
+<a class="l3" href="#day-11">День 11 — Модуль реализации :data:medications:impl</a>
+<a class="l3" href="#day-12">День 12 — Gradle Kotlin DSL: api vs implementation</a>
+<a class="l3" href="#day-13">День 13 — Hilt и DI</a>
+<a class="l3" href="#day-14">День 14 — Миграции и тесты DAO</a>
+<a class="l2" href="#week-3">Неделя 3. Firebase, Firestore и Retrofit</a>
+<a class="l3" href="#day-15">День 15 — Firebase setup и Authentication</a>
+<a class="l3" href="#day-16">День 16 — Firestore CRUD и мапперы</a>
+<a class="l3" href="#day-17">День 17 — Security rules и структура данных</a>
+<a class="l3" href="#day-18">День 18 — Offline persistence и Room</a>
+<a class="l3" href="#day-19">День 19 — Retrofit и OkHttp</a>
+<a class="l3" href="#day-20">День 20 — Погода и качество воздуха</a>
+<a class="l3" href="#day-21">День 21 — Индекс самочувствия</a>
+<a class="l2" href="#week-4">Неделя 4. Фоновые уведомления и завершение MVP</a>
+<a class="l3" href="#day-22">День 22 — Каналы и базовые уведомления</a>
+<a class="l3" href="#day-23">День 23 — AlarmManager и точные будильники</a>
+<a class="l3" href="#day-24">День 24 — Расписания и действия из уведомления</a>
+<a class="l3" href="#day-25">День 25 — Перезагрузка и системные ограничения</a>
+<a class="l3" href="#day-26">День 26 — Firebase Cloud Messaging</a>
+<a class="l3" href="#day-27">День 27 — Тесты</a>
+<a class="l3" href="#day-28">День 28 — Полировка и README</a>
+<a class="l2" href="#day-format">Как организовать каждый учебный день</a>
+<a class="l2" href="#results">Что должно получиться через 4 недели</a>
+<a class="l2" href="#adr">Архитектурные решения</a>
+<a class="l3" href="#adr-1">ADR-1. Вертикальные срезы, а не горизонтальные слои</a>
+<a class="l3" href="#adr-2">ADR-2. Направление зависимостей</a>
+<a class="l3" href="#adr-3">ADR-3. api vs implementation — главное Gradle-решение</a>
+<a class="l3" href="#adr-4">ADR-4. Доменные модули — чистый Kotlin без Android</a>
+<a class="l3" href="#adr-5">ADR-5. Offline-first: Firestore — источник правды, Room — кэш</a>
+<a class="l3" href="#adr-6">ADR-6. Внешние данные изолированы</a>
+<a class="l3" href="#adr-7">ADR-7. DI-связывание живёт в модуле реализации</a>
+<a class="l3" href="#adr-8">ADR-8. Версии без Version Catalog</a>
+<a class="l3" href="#adr-9">ADR-9. Тестирование по слоям</a>
+<a class="l3" href="#adr-10">ADR-10. Однонаправленный поток данных (UDF)</a>
+<a class="l3" href="#adr-11">ADR-11. Дизайн-система в :core:ui</a>
+<a class="l3" href="#adr-12">ADR-12. Навигация на типизированных маршрутах</a>
+<a class="l2" href="#stack">1. Технологический стек</a>
+<a class="l2" href="#architecture">2. Архитектура проекта</a>
+<a class="l2" href="#background">3. Как разобраться с фоновыми уведомлениями</a>
+<a class="l2" href="#kotlin-compose">4. Что ты изучишь в Kotlin и Compose</a>
+<a class="l2" href="#firebase">5. Firebase, внешний REST и самочувствие</a>
+<a class="l2" href="#dependencies">6. Как подключать зависимости без libs.versions.toml</a>
+<a class="l2" href="#design-system">7. Дизайн-система и переиспользуемый UI</a>
+<a class="l2" href="#navigation">8. Навигация: типизированные маршруты</a>
+  </div>
+  <div id="grip" title="Потяни, чтобы изменить ширину"></div>
+</nav>
+<main>
+<h1 id="top">🗓️ Dayly — план разработки на 4 недели</h1>
+<blockquote>
+<p><strong>Формат:</strong> 3–4 часа в день, 6–7 дней в неделю
+<strong>Итого:</strong> ~84–112 часов практики за 4 недели
+<strong>Распределение времени:</strong> 20 % — изучение Kotlin и Android · 70 % — разработка · 10 % — тестирование и разбор ошибок</p>
+</blockquote>
+<p>Этого достаточно, чтобы создать приличный MVP Dayly, изучить основные возможности Kotlin и попробовать настоящую многомодульную архитектуру. Не будем превращать проект в бесконечный учебник.</p>
+<blockquote>
+<p>☁️ <strong>Backend — только Firebase.</strong> Аутентификация через Firebase Authentication, данные пользователя — в Cloud Firestore, push — через FCM. Собственного сервера нет.</p>
+<p>🌐 <strong>Retrofit + OkHttp тоже в деле</strong> — но строго для внешнего публичного API. Данные пользователя через Retrofit не ходят.</p>
+<p>🌤️ <strong>Метрика самочувствия.</strong> Из погоды считается индекс здоровья: головная боль, обезвоживание, суставы, дыхание, комфорт сна, УФ. Погода — через Retrofit (Open-Meteo), расчёт — чистая Kotlin-логика.</p>
+</blockquote>
+<blockquote>
+<p>📌 Ниже по дням — не пошаговые инструкции, а <strong>подсказки</strong>: что здесь по-настоящему важно, где обычно застревают и как не тратить время впустую.</p>
+</blockquote>
+<blockquote>
+<p>⬆️ <a href="#top">К содержанию</a></p>
+</blockquote>
+<hr>
+<h2>📑 Содержание</h2>
+<p><strong>План по неделям</strong></p>
+<ul>
+<li><a href="#overview">Обзор четырёх недель</a></li>
+<li><a href="#week-1">Неделя 1. Kotlin и Compose</a></li>
+<li><a href="#week-2">Неделя 2. Room, архитектура и Gradle</a></li>
+<li><a href="#week-3">Неделя 3. Firebase, Firestore и Retrofit</a></li>
+<li><a href="#week-4">Неделя 4. Фоновые уведомления и завершение MVP</a></li>
+<li><a href="#day-format">Как организовать каждый учебный день</a></li>
+<li><a href="#results">Что должно получиться через 4 недели</a></li>
+</ul>
+<p><strong>Справочник</strong></p>
+<ul>
+<li><a href="#adr">Архитектурные решения (ADR)</a></li>
+<li><a href="#stack">1. Технологический стек</a></li>
+<li><a href="#architecture">2. Архитектура проекта</a></li>
+<li><a href="#background">3. Как разобраться с фоновыми уведомлениями</a></li>
+<li><a href="#kotlin-compose">4. Что ты изучишь в Kotlin и Compose</a></li>
+<li><a href="#firebase">5. Firebase, внешний REST и самочувствие</a></li>
+<li><a href="#dependencies">6. Как подключать зависимости без <code>libs.versions.toml</code></a></li>
+<li><a href="#design-system">7. Дизайн-система и переиспользуемый UI</a></li>
+<li><a href="#navigation">8. Навигация: типизированные маршруты</a></li>
+</ul>
+<p><strong>Дни</strong></p>
+<ul>
+<li><a href="#day-1">1</a> · <a href="#day-2">2</a> · <a href="#day-3">3</a> · <a href="#day-4">4</a> · <a href="#day-5">5</a> · <a href="#day-6">6</a> · <a href="#day-7">7</a></li>
+<li><a href="#day-8">8</a> · <a href="#day-9">9</a> · <a href="#day-10">10</a> · <a href="#day-11">11</a> · <a href="#day-12">12</a> · <a href="#day-13">13</a> · <a href="#day-14">14</a></li>
+<li><a href="#day-15">15</a> · <a href="#day-16">16</a> · <a href="#day-17">17</a> · <a href="#day-18">18</a> · <a href="#day-19">19</a> · <a href="#day-20">20</a> · <a href="#day-21">21</a></li>
+<li><a href="#day-22">22</a> · <a href="#day-23">23</a> · <a href="#day-24">24</a> · <a href="#day-25">25</a> · <a href="#day-26">26</a> · <a href="#day-27">27</a> · <a href="#day-28">28</a></li>
+</ul>
+<p><strong>ADR</strong></p>
+<ul>
+<li><a href="#adr-1">1</a> · <a href="#adr-2">2</a> · <a href="#adr-3">3</a> · <a href="#adr-4">4</a> · <a href="#adr-5">5</a> · <a href="#adr-6">6</a> · <a href="#adr-7">7</a> · <a href="#adr-8">8</a> · <a href="#adr-9">9</a> · <a href="#adr-10">10</a> · <a href="#adr-11">11</a> · <a href="#adr-12">12</a></li>
+</ul>
+<hr>
+<h2 id="overview">Обзор четырёх недель</h2>
+<table>
+<thead>
+<tr>
+<th align="center">#</th>
+<th>Неделя</th>
+<th>Тема</th>
+<th align="center">Нагрузка</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>01</strong></td>
+<td>1</td>
+<td><strong>Kotlin + Jetpack Compose</strong></td>
+<td align="center">21–28 ч</td>
+<td>Освоить синтаксис Kotlin и собрать UI приложения</td>
+</tr>
+<tr>
+<td align="center"><strong>02</strong></td>
+<td>2</td>
+<td><strong>Room + Clean Architecture + Gradle</strong></td>
+<td align="center">21–28 ч</td>
+<td>Реализовать локальное хранилище, слои приложения и первые модули</td>
+</tr>
+<tr>
+<td align="center"><strong>03</strong></td>
+<td>3</td>
+<td><strong>Firebase + Firestore + Retrofit + DI</strong></td>
+<td align="center">21–28 ч</td>
+<td>Подключить облако, внешний REST, аутентификацию и метрику самочувствия</td>
+</tr>
+<tr>
+<td align="center"><strong>04</strong></td>
+<td>4</td>
+<td><strong>Уведомления + тесты + полировка</strong></td>
+<td align="center">21–28 ч</td>
+<td>Реализовать фоновые напоминания и подготовить проект к демонстрации</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="week-1">Неделя 1. Kotlin и Compose</h2>
+<blockquote>
+<p>🎯 <strong>Цель:</strong> приложение уже выглядит как настоящее, а не как набор учебных примеров.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">День</th>
+<th>Тема</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><a href="#day-1">1</a></td>
+<td>Настройка окружения и базовый Kotlin</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-2">2</a></td>
+<td>Gradle, модули и первые модели</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-3">3</a></td>
+<td>Коллекции, generics, расширения</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-4">4</a></td>
+<td>Корутины и Flow</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-5">5</a></td>
+<td>Основы Compose и дизайн-система</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-6">6</a></td>
+<td>Состояние и ViewModel</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-7">7</a></td>
+<td>Навигация: типизированные маршруты</td>
+</tr>
+</tbody></table>
+<h3 id="day-1">День 1 — Настройка окружения и базовый Kotlin</h3>
+<ul>
+<li>Не застревай на настройке: стандартный Compose-проект уже рабочий, а день уйдёт на синтаксис. Цикл «написал → запустил» учит быстрее чтения.</li>
+<li><code>minSdk = 26</code> (Android 8) закрывает почти всё нужное для уведомлений; <code>compileSdk</code> — только для сборки.</li>
+<li>Ошибки Gradle чаще про версии плагинов и интернет, а не про код: читай <strong>первую</strong> строку.</li>
+</ul>
+<p><strong>Ориентир:</strong> приложение запускается на эмуляторе, проект под Git, есть первый коммит.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://metanit.com/kotlin/">METANIT: Kotlin</a> · <a href="https://kotlinlang.ru/">kotlinlang.ru</a></p>
+<h3 id="day-2">День 2 — Gradle, модули и первые модели</h3>
+<ul>
+<li>Модуль появляется только после <code>include(&quot;:core:ui&quot;)</code> в <code>settings.gradle.kts</code>: папка и <code>build.gradle.kts</code> без строки в settings для Gradle не существуют.</li>
+<li>Двоеточие — это вложенность папок: <code>domain/medications/api</code> → <code>:domain:medications:api</code>. Промежуточные папки модулями не становятся, build-файл в них не нужен.</li>
+<li>Держи каркас минимальным: <code>:core:ui</code> (тема и токены) и <code>:domain:medications:api</code> (чистый Kotlin). Полный скелет сразу — только мешает.</li>
+<li>Модели пиши сразу в <code>domain</code>, а не в <code>app</code>: <code>data class Medication</code>, <code>sealed interface MedicationUiState</code>. Тогда их не придётся переносить на второй неделе.</li>
+<li><code>data class</code> бесплатно даёт <code>equals</code>/<code>hashCode</code>/<code>copy</code> — на этом держится перерисовка Compose и <code>distinctUntilChanged</code> в <code>Flow</code>. Модели — неизменяемые.</li>
+<li><code>sealed interface</code> под <code>UiState</code>: <code>when</code> заставит обработать все варианты, компилятор не даст забыть.</li>
+</ul>
+<p><strong>Ориентир:</strong> модули <code>:core:ui</code> и <code>:domain:medications:api</code> зарегистрированы в <code>settings.gradle.kts</code> и собираются; тема переехала в <code>:core:ui</code>; в <code>domain</code> лежат <code>Medication</code> и <code>sealed interface MedicationUiState</code> с <code>Loading</code>/<code>Empty</code>/<code>Content</code>/<code>Error</code>, а <code>:app</code> зависит от обоих модулей.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="#architecture">Как подключить новый модуль</a> · <a href="https://docs.gradle.org/current/userguide/java_library_plugin.html">Gradle: java-library и api</a> · <a href="https://metanit.com/kotlin/">METANIT: Kotlin</a></p>
+<h3 id="day-3">День 3 — Коллекции, generics, расширения</h3>
+<ul>
+<li><code>map</code>/<code>filter</code>/<code>groupBy</code>/<code>associateBy</code>/<code>sortedBy</code> — это 80 % работы с данными; после них циклы почти не нужны.</li>
+<li>Scope-функции: достаточно <code>let</code>, <code>apply</code>, <code>also</code>; остальные — по мере надобности.</li>
+<li>Extension-функции — поведение без наследования: вынеси туда форматирование дозы и времени.</li>
+</ul>
+<p><strong>Ориентир:</strong> список лекарств группируется по дню и сортируется по времени, а формат дозы и времени живёт в extension-функциях.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://metanit.com/kotlin/">METANIT: коллекции</a> · <a href="https://kotlinlang.ru/">kotlinlang.ru</a></p>
+<h3 id="day-4">День 4 — Корутины и Flow</h3>
+<ul>
+<li><code>suspend</code> — это «можно приостановить», а не «фон». Scope — <code>viewModelScope</code>, не <code>GlobalScope</code>.</li>
+<li>Для состояния UI — <code>StateFlow</code>; <code>SharedFlow</code>/<code>Channel</code> — для одноразовых событий (навигация, snackbar).</li>
+<li><code>Flow</code> ленивый: без <code>collect</code> не выполняется ничего.</li>
+</ul>
+<p><strong>Ориентир:</strong> in-memory репозиторий отдаёт <code>StateFlow&lt;List&lt;Medication&gt;&gt;</code>, и добавление лекарства обновляет список без ручного перезапуска.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://kotlinlang.ru/docs/coroutines-guide.html">kotlinlang.ru: руководство по корутинам</a></p>
+<h3 id="day-5">День 5 — Основы Compose и дизайн-система</h3>
+<ul>
+<li>Compose-экран — функция от состояния: порядок <code>Modifier</code> влияет на результат, а в <code>LazyColumn.item</code> нужен <code>key</code>.</li>
+<li>Дополняй <code>:core:ui</code> компонентами: токены и <code>DaylyTheme</code> уже там с дня 2, теперь очередь <code>DaylyCard</code> и <code>DaylyButton</code>. Material не даёт отступов — определи их в токенах.</li>
+<li>В компоненте первым идёт <code>modifier</code> и ставится на корень: размещением владеет вызывающий. Подробности — в <a href="#design-system">разделе 7</a>.</li>
+</ul>
+<p><strong>Ориентир:</strong> экран списка на моковых данных; в <code>:core:ui</code> появились первые переиспользуемые компоненты со своими <code>@Preview</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://metanit.com/kotlin/jetpack/">METANIT: Jetpack Compose</a> · <a href="https://developer.android.com/develop/ui/compose/documentation?hl=ru">Compose docs</a></p>
+<h3 id="day-6">День 6 — Состояние и ViewModel</h3>
+<ul>
+<li><code>remember</code> живёт в композиции, <code>rememberSaveable</code> переживает смерть процесса — для полей ввода нужен второй.</li>
+<li>Состояние экрана — в ViewModel; в Compose предпочитай <code>collectAsStateWithLifecycle</code>.</li>
+<li>Одно <code>UiState</code> на экран вместо набора флагов.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>MedicationViewModel</code> отдаёт <code>StateFlow&lt;MedicationUiState&gt;</code>, и экран показывает загрузку, «пусто» и список; состояние переживает поворот.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://metanit.com/kotlin/jetpack/">METANIT: ViewModel</a> · <a href="https://developer.android.com/topic/architecture?hl=ru">Architecture</a></p>
+<h3 id="day-7">День 7 — Навигация: типизированные маршруты</h3>
+<ul>
+<li>Маршрут — это <code>@Serializable</code> тип, а не строка: <code>composable&lt;Home&gt;</code> и <code>navigate(MedicationDetails(id))</code>. Опечатка становится ошибкой компиляции, а рефакторинг безопасен.</li>
+<li>Через маршрут передавай только id, а не объект: экран сам подтянет данные из репозитория, и back stack не будет таскать состояние.</li>
+<li>Простые переходы — колбэками; навигация «после действия» — одноразовым событием из ViewModel через <code>Channel</code>, которое выполняет <code>LaunchedEffect</code>.</li>
+<li>Граф живёт в <code>:app</code>: фичи не знают друг о друге, а переходы между ними связываются лямбдами. Подробности — в <a href="#navigation">разделе 8</a>.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>NavHost</code> на маршрутах <code>Home</code>/<code>Medications</code>/<code>AddMedication</code>/<code>SleepSettings</code>; экран деталей принимает <code>id</code> как аргумент, а после добавления записи приложение возвращается к списку и он обновляется.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/guide/navigation?hl=ru">Navigation</a> · <a href="https://metanit.com/kotlin/jetpack/">METANIT: навигация</a></p>
+<blockquote>
+<p>💡 Не пытайся идеально изучить весь Kotlin. На каждый новый концепт делай небольшой пример прямо в проекте.</p>
+</blockquote>
+<p><strong>Итог недели 1:</strong> приложение с четырьмя экранами (главный, список лекарств, форма добавления, настройки сна), данные живут в памяти, навигация работает; с первого дня подняты модули <code>:core:ui</code> и <code>:domain:medications:api</code>, тема и модели живут там, а не в <code>app</code>.</p>
+<hr>
+<h2 id="week-2">Неделя 2. Room, архитектура и Gradle</h2>
+<blockquote>
+<p>🎯 <strong>Цель:</strong> полноценная работа с локальными данными и правильные границы модулей.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">День</th>
+<th>Тема</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><a href="#day-8">8</a></td>
+<td>Room: Entity, DAO, Database</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-9">9</a></td>
+<td>CRUD и Flow из Room</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-10">10</a></td>
+<td>MVVM, Repository, Use Case</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-11">11</a></td>
+<td>Модуль реализации <code>:data:medications:impl</code></td>
+</tr>
+<tr>
+<td align="center"><a href="#day-12">12</a></td>
+<td>Gradle Kotlin DSL: <code>api</code> vs <code>implementation</code></td>
+</tr>
+<tr>
+<td align="center"><a href="#day-13">13</a></td>
+<td>Hilt и DI</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-14">14</a></td>
+<td>Миграции и тесты DAO</td>
+</tr>
+</tbody></table>
+<h3 id="day-8">День 8 — Room: Entity, DAO, Database</h3>
+<ul>
+<li>Room — «аннотации + генератор кода»: важно, что DAO порождает <code>*_Impl</code>, а не сам синтаксис.</li>
+<li><code>Flow</code> в DAO — то, ради чего Room берут: база сама сообщает об изменениях.</li>
+<li>KSP-плагин и <code>room-compiler</code> — в том модуле, где объявлены <code>@Entity</code>/<code>@Database</code>; схему экспортируй сразу.</li>
+</ul>
+<p><strong>Ориентир:</strong> есть <code>MedicationEntity</code> и <code>MedicationDao</code>, после сборки — <code>MedicationDao_Impl</code>, схема в <code>app/schemas/</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/training/data-storage/room?hl=ru">Room</a> · <a href="https://metanit.com/kotlin/jetpack/">METANIT: Room</a></p>
+<h3 id="day-9">День 9 — CRUD и Flow из Room</h3>
+<ul>
+<li>В DAO операции с изменениями — <code>suspend</code>, чтение — <code>Flow</code>.</li>
+<li>Ошибки базы обрабатывай рядом с репозиторием, а не в UI; entity не возвращай в UI.</li>
+</ul>
+<p><strong>Ориентир:</strong> добавленное лекарство остаётся после перезапуска, а список на экране — <code>Flow</code> из DAO.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/training/data-storage/room?hl=ru">Room: DAO и запросы</a></p>
+<h3 id="day-10">День 10 — MVVM, Repository, Use Case</h3>
+<ul>
+<li>Repository — интерфейс в domain, реализация в data: это и есть точка замены хранилища.</li>
+<li>Контракт <code>MedicationRepository</code> клади сразу в <code>:domain:medications:api</code> — модуль у тебя есть с недели 1. Реализация пока может жить рядом с Room в <code>app</code>.</li>
+<li>UseCase — когда логика переиспользуется или тестируется отдельно; зависимости — только через конструктор.</li>
+<li>Мапперы entity ↔ domain не дают базе протечь в UI.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>MedicationRepository</code> — интерфейс в <code>:domain:medications:api</code>, реализация — рядом с Room; ViewModel не знает про <code>MedicationDao</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/topic/architecture?hl=ru">Architecture</a> · <a href="https://startandroid.ru/">Start Android: Architecture Components</a></p>
+<h3 id="day-11">День 11 — Модуль реализации <code>:data:medications:impl</code></h3>
+<ul>
+<li><code>api</code>-модуль уже создан на неделе 1, поэтому здесь появляется второй слой — модуль реализации.</li>
+<li>Зарегистрируй его в <code>settings.gradle.kts</code> и подключи в <code>app</code>; реализация зависит от <code>:domain:medications:api</code> и <code>:core:database</code>.</li>
+<li>Выноси постепенно, проверяя сборку после каждого шага: большой перенос в один заход почти всегда ломается.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>:data:medications:impl</code> в <code>settings.gradle.kts</code>; <code>MedicationRepositoryImpl</code> живёт там, <code>feature:medications</code> по-прежнему зависит только от <code>:domain:medications:api</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/topic/architecture?hl=ru">Модуляризация</a> · <a href="https://startandroid.ru/">Start Android</a></p>
+<h3 id="day-12">День 12 — Gradle Kotlin DSL: <code>api</code> vs <code>implementation</code></h3>
+<ul>
+<li><code>implementation</code> по умолчанию; <code>api</code> — только если тип из зависимости виден в публичных сигнатурах.</li>
+<li><code>implementation(project(&quot;:x&quot;))</code> даёт классы <code>:x</code>, но <strong>не</strong> его зависимости — это главная путаница.</li>
+<li><code>./gradlew :data:medications:impl:dependencies</code> показывает граф; версии Kotlin/Compose/AGP — одни на проект.</li>
+</ul>
+<p>Подробный разбор с примерами — в <a href="#adr-3">ADR-3</a>.</p>
+<p><strong>Ориентир:</strong> <code>api(coroutines)</code> в domain и <code>implementation(retrofit)</code> в <code>:core:network</code>; в дереве зависимостей Retrofit не виден у UI.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://docs.gradle.org/current/userguide/java_library_plugin.html">Gradle: java-library и api</a> · <a href="https://metanit.com/kotlin/jetpack/">METANIT: Gradle</a></p>
+<h3 id="day-13">День 13 — Hilt и DI</h3>
+<ul>
+<li><code>@Binds</code> — интерфейс → реализация; <code>@Provides</code> — внешние типы (Retrofit, Firestore).</li>
+<li>Классу с <code>@Inject constructor</code> <code>@Provides</code> не нужен; связывание — в модуле реализации, а не в <code>app</code>.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>MedicationRepositoryImpl</code> приходит в ViewModel через <code>@Inject</code>, в коде нет ни <code>new</code>, ни <code>getInstance</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/training/dependency-injection/hilt-android?hl=ru">Hilt</a></p>
+<h3 id="day-14">День 14 — Миграции и тесты DAO</h3>
+<ul>
+<li>Смена схемы без миграции — падение у пользователя; одной настоящей <code>Migration</code> для старта достаточно.</li>
+<li>Тесты DAO на in-memory базе — самая быстрая точка входа в тесты.</li>
+</ul>
+<p><strong>Ориентир:</strong> БД версии 2 с реальной <code>Migration</code>, тест DAO зелёный, миграция покрыта <code>MigrationTestHelper</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/training/data-storage/room?hl=ru">Room</a> · <a href="https://startandroid.ru/">Start Android: тестирование</a></p>
+<blockquote>
+<p>💡 Не создавай все возможные модули сразу. <code>:core:ui</code> и <code>:domain:medications:api</code> уже есть с недели 1 — на второй неделе добавь к ним <code>:core:database</code> и <code>:data:medications:impl</code>, то есть один полноценный вертикальный срез.</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Роль Room после подключения Firebase.</strong> Firestore умеет офлайн-кэш из коробки, но Room остаётся удобнее для двух задач: быстрых запросов под расписание напоминаний и явной модели данных в domain-слое. Поэтому Room проектируем как локальный кэш впереди Firestore, а не как единственный источник правды.</p>
+</blockquote>
+<p><strong>Итог недели 2:</strong> лекарства сохраняются в Room между запусками; добавились <code>:core:database</code> и <code>:data:medications:impl</code>, контракт остаётся в <code>:domain:medications:api</code>; Hilt связывает репозиторий, миграция и тест DAO зелёные.</p>
+<hr>
+<h2 id="week-3">Неделя 3. Firebase, Firestore и Retrofit</h2>
+<blockquote>
+<p>🎯 <strong>Цель:</strong> подключить облако Firebase (аутентификация + хранение) и внешний REST через Retrofit, связав всё с локальным кэшем.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">День</th>
+<th>Тема</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><a href="#day-15">15</a></td>
+<td>Firebase setup и Authentication</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-16">16</a></td>
+<td>Firestore CRUD и мапперы</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-17">17</a></td>
+<td>Security rules и структура данных</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-18">18</a></td>
+<td>Offline persistence и Room</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-19">19</a></td>
+<td>Retrofit и OkHttp</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-20">20</a></td>
+<td>Погода и качество воздуха</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-21">21</a></td>
+<td>Индекс самочувствия</td>
+</tr>
+</tbody></table>
+<h3 id="day-15">День 15 — Firebase setup и Authentication</h3>
+<ul>
+<li><code>google-services.json</code> — только в модуле <code>app</code>; версии Firebase — через BoM.</li>
+<li><code>FirebaseAuth.currentUser</code> достаточно для навигации «вход → приложение»; состояние — поток, а не одна проверка.</li>
+</ul>
+<p><strong>Ориентир:</strong> вход по email работает, сессия переживает перезапуск, навигацией управляет <code>AuthRepository.currentUser</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://firebase.google.com/docs/auth?hl=ru">Firebase Authentication</a></p>
+<h3 id="day-16">День 16 — Firestore CRUD и мапперы</h3>
+<ul>
+<li>Документ Firestore ≈ <code>Map</code>: маппинг прост, но версионирование схемы — на тебе.</li>
+<li><code>snapshots()</code> — реактивно, <code>get()</code> — одноразово; <code>@DocumentId</code> заполняет SDK, время — через <code>FieldValue.serverTimestamp()</code>.</li>
+</ul>
+<p><strong>Ориентир:</strong> в консоли Firestore видно <code>users/{uid}/medications/{id}</code>, чтение идёт через <code>snapshots()</code>, id приходит в <code>@DocumentId</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://firebase.google.com/docs/firestore?hl=ru">Cloud Firestore</a></p>
+<h3 id="day-17">День 17 — Security rules и структура данных</h3>
+<ul>
+<li>Security rules — единственная защита, раз backend-кода нет; проверяй их в эмуляторе правил.</li>
+<li>Структура под <code>users/{uid}</code> делает правила короткими; составные запросы требуют индексов.</li>
+</ul>
+<p><strong>Ориентир:</strong> со второго аккаунта данные первого недоступны, чужой запрос даёт <code>PERMISSION_DENIED</code>.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://firebase.google.com/docs/rules?hl=ru">Security rules</a></p>
+<h3 id="day-18">День 18 — Offline persistence и Room</h3>
+<ul>
+<li>Один источник правды (Firestore) и один путь чтения (Room): два источника — генератор багов.</li>
+<li>Пиши локально, затем в облако; продумай состояние «нет ни в облаке, ни в кэше».</li>
+</ul>
+<p><strong>Ориентир:</strong> в авиарежиме добавленное лекарство видно сразу и уходит в Firestore после включения сети.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://firebase.google.com/docs/firestore?hl=ru">Firestore: офлайн и кэш</a> · <a href="https://firebase.google.com/docs/emulator-suite?hl=ru">Emulator Suite</a></p>
+<h3 id="day-19">День 19 — Retrofit и OkHttp</h3>
+<ul>
+<li>Логирующий интерсептор — включай сразу; таймауты по умолчанию велики, задай их явно.</li>
+<li>DTO ≠ domain-модель; используй <code>suspend</code>-функции, а не <code>Call.enqueue</code>.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>GET v1/forecast</code> возвращает <code>WeatherDto</code>, в Logcat видны строка запроса и ответ, таймауты заданы явно.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://square.github.io/retrofit/">Retrofit</a> · <a href="https://square.github.io/okhttp/">OkHttp</a></p>
+<h3 id="day-20">День 20 — Погода и качество воздуха</h3>
+<ul>
+<li>Два сервиса (прогноз + качество воздуха) — тренировка агрегации нескольких источников.</li>
+<li>Кэшируй последний успешный ответ и различай «нет данных» и «запрос упал».</li>
+</ul>
+<p><strong>Ориентир:</strong> на главном экране карточка с температурой, влажностью и PM2.5; без сети — последний кэш, а не пустой экран.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://open-meteo.com/en/docs">Open-Meteo: документация</a></p>
+<h3 id="day-21">День 21 — Индекс самочувствия</h3>
+<ul>
+<li>Расчёт — чистая функция без Android: иначе её нельзя тестировать быстро.</li>
+<li>Тестируй границы (6 гПа, 28 °C, <code>uv_index = 6</code>); формулировки подсказок держи в одном месте.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>HealthIndexCalculator</code> возвращает score и список факторов, есть тесты на границы, обновление идёт через WorkManager.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://kotlinlang.ru/docs/coroutines-guide.html">kotlinlang.ru: корутины и Flow</a></p>
+<blockquote>
+<p>💡 <strong>Две разные сети, не смешивай.</strong> Данные пользователя идут через Firestore SDK, Retrofit — только за внешней погодой. Поэтому DTO, сериализация и интерсепторы нужны лишь для внешнего API.</p>
+<p>💡 <strong>Прямые запросы vs имитация.</strong> В продакшене <code>data:impl</code> вызывает Firestore и Retrofit напрямую. «Имитация» нужна только в тестах: ViewModel мокается через <code>MockK</code>, Firebase проверяется на <strong>Emulator Suite</strong>, внешний REST — на <strong>MockWebServer</strong>, а расчёт индекса тестируется без сети вообще.</p>
+</blockquote>
+<p><strong>Итог недели 3:</strong> пользователь входит в аккаунт, лекарства лежат в Firestore и читаются через Room-кэш, а на главном экране показывается индекс самочувствия из актуальной погоды.</p>
+<blockquote>
+<p>⚠️ Не трать много времени на сложную синхронизацию конфликтующих изменений. Для MVP достаточно: Firestore — источник правды, Room — кэш, а UI всегда читает из Room.</p>
+</blockquote>
+<hr>
+<h2 id="week-4">Неделя 4. Фоновые уведомления и завершение MVP</h2>
+<blockquote>
+<p>🎯 <strong>Цель:</strong> реализовать главную особенность приложения — напоминания, которые работают при закрытом UI.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">День</th>
+<th>Тема</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><a href="#day-22">22</a></td>
+<td>Каналы и базовые уведомления</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-23">23</a></td>
+<td>AlarmManager и точные будильники</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-24">24</a></td>
+<td>Расписания и действия из уведомления</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-25">25</a></td>
+<td>Перезагрузка и системные ограничения</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-26">26</a></td>
+<td>Firebase Cloud Messaging</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-27">27</a></td>
+<td>Тесты</td>
+</tr>
+<tr>
+<td align="center"><a href="#day-28">28</a></td>
+<td>Полировка и README</td>
+</tr>
+</tbody></table>
+<h3 id="day-22">День 22 — Каналы и базовые уведомления</h3>
+<ul>
+<li>Канал обязателен с Android 8, иначе уведомление просто не покажется; на 13+ нужен <code>POST_NOTIFICATIONS</code> в рантайме.</li>
+<li>Начни с уведомления по кнопке: убедись, что канал и разрешение работают, до всяких расписаний.</li>
+</ul>
+<p><strong>Ориентир:</strong> канал <code>reminders</code> создан, уведомление показывается, а на Android 13+ приложение корректно запрашивает разрешение.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/develop/ui/views/notifications?hl=ru">Notifications</a></p>
+<h3 id="day-23">День 23 — AlarmManager и точные будильники</h3>
+<ul>
+<li><code>AlarmManager</code> — единственный способ разбудить приложение в точное время; <code>WorkManager</code> не про точность до минуты.</li>
+<li>Флаги <code>PendingIntent</code> важны: неверный — уведомление не сработает или перезапишет чужое.</li>
+</ul>
+<p><strong>Ориентир:</strong> будильник на +1 минуту срабатывает при закрытом приложении точно в назначенное время.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/develop/background-work/services/alarms/schedule?hl=ru">Schedule alarms</a></p>
+<h3 id="day-24">День 24 — Расписания и действия из уведомления</h3>
+<ul>
+<li>При редактировании отменяй старый будильник; для повторов надёжнее перепланировать следующий, чем верить <code>setRepeating</code>.</li>
+<li>Действие «Принял» — через <code>BroadcastReceiver</code>; привязка «расписание ↔ будильник» — по стабильному id.</li>
+</ul>
+<p><strong>Ориентир:</strong> создание, изменение и отмена дают ровно один будильник, а кнопка «Принял» пишет отметку в базу.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://startandroid.ru/">Start Android: уведомления</a></p>
+<h3 id="day-25">День 25 — Перезагрузка и системные ограничения</h3>
+<ul>
+<li>После перезагрузки будильники теряются — восстанавливай их на <code>BOOT_COMPLETED</code>.</li>
+<li>Doze и энергосбережение режут фон; точное время гарантирует <code>setExactAndAllowWhileIdle</code>; проверяй на реальном устройстве.</li>
+</ul>
+<p><strong>Ориентир:</strong> после перезагрузки устройства запланированное напоминание срабатывает снова.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/topic/libraries/architecture/workmanager?hl=ru">WorkManager</a> · <a href="https://developer.android.com/develop/background-work/services/alarms/schedule?hl=ru">Schedule alarms</a></p>
+<h3 id="day-26">День 26 — Firebase Cloud Messaging</h3>
+<ul>
+<li>FCM — про сообщения от сервера, не про будильники: не подменяй им <code>AlarmManager</code>.</li>
+<li>Различай notification- и data-сообщения: в фоне ведут себя по-разному; работай через тему, а не по токену.</li>
+</ul>
+<p><strong>Ориентир:</strong> тестовое сообщение из консоли Firebase приходит и отображается, токен виден в логах.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://firebase.google.com/docs/cloud-messaging?hl=ru">Cloud Messaging</a></p>
+<h3 id="day-27">День 27 — Тесты</h3>
+<ul>
+<li>Пирамида: много JVM-тестов на логику, меньше на data, совсем немного UI.</li>
+<li><code>MockWebServer</code> проверяет таймауты и ошибки без реальной сети; тестируй результат, а не число вызовов.</li>
+</ul>
+<p><strong>Ориентир:</strong> <code>./gradlew test</code> зелёный: есть тесты ViewModel (MockK), сервиса (MockWebServer) и расчёта индекса, плюс один Compose UI test.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://developer.android.com/training/testing?hl=ru">Test your app</a></p>
+<h3 id="day-28">День 28 — Полировка и README</h3>
+<ul>
+<li>Прогоняй сценарий как пользователь: без сети, без разрешений, с пустой базой.</li>
+<li>README со схемой модулей и разделом «что вне MVP» экономит время и производит впечатление.</li>
+</ul>
+<p><strong>Ориентир:</strong> сценарий пройден на устройстве целиком, README со схемой модулей и скриншотами, зафиксировано, что осталось вне MVP.</p>
+<p><strong>📚 Куда смотреть:</strong> <a href="https://habr.com/ru/hubs/android/">Habr: хаб Android</a></p>
+<blockquote>
+<p>⚠️ Помни, что <code>AlarmManager</code> и FCM решают разные задачи. Для локального расписания нужен первый, для сообщений от сервера — второй. <code>WorkManager</code> предназначен для фоновых задач, которым не нужна точность до минуты.</p>
+<p>🔗 FCM и Firestore — части одного проекта Firebase, поэтому <code>google-services.json</code> и инициализация общие для обоих.</p>
+</blockquote>
+<p><strong>Итог недели 4:</strong> приложение показывает локальное напоминание при закрытом UI, восстанавливает расписания после перезагрузки, принимает тестовый push и проходит прогон по сценарию без падений.</p>
+<hr>
+<h2 id="day-format">Как организовать каждый учебный день</h2>
+<p>Режим на 3,5 часа:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Время</th>
+<th>Блок</th>
+<th>Что делать</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>30 мин</strong></td>
+<td>📚 Изучение</td>
+<td>Одна новая тема Kotlin или Android</td>
+</tr>
+<tr>
+<td align="center"><strong>2 ч</strong></td>
+<td>💻 Разработка</td>
+<td>Реализация функциональности в Dayly</td>
+</tr>
+<tr>
+<td align="center"><strong>30 мин</strong></td>
+<td>🧪 Самостоятельная практика</td>
+<td>Изменить решение, проверить понимание, разобрать ошибки</td>
+</tr>
+<tr>
+<td align="center"><strong>30 мин</strong></td>
+<td>✅ Тесты и заметки</td>
+<td>Зафиксировать выводы и проверить работоспособность</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 Если какая-то тема окажется сложной, лучше потратить на неё дополнительный день, чем механически переходить дальше. Особенно это касается корутин, Flow, границ модулей и Android-уведомлений.</p>
+</blockquote>
+<hr>
+<h2 id="results">Что должно получиться через 4 недели</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Рабочее Android-приложение на Kotlin и Jetpack Compose.</li>
+<li><input disabled="" type="checkbox"> Аутентификация через Firebase Authentication (email и/или Google).</li>
+<li><input disabled="" type="checkbox"> Firestore и Room в связке через Repository: облако как источник правды, Room как кэш.</li>
+<li><input disabled="" type="checkbox"> Внешний REST через Retrofit + OkHttp с кэшем и тестами на MockWebServer.</li>
+<li><input disabled="" type="checkbox"> Метрика самочувствия по погоде — с unit-тестами на расчёт.</li>
+<li><input disabled="" type="checkbox"> Несколько Gradle-модулей с разделением <code>api</code> и <code>implementation</code>.</li>
+<li><input disabled="" type="checkbox"> Дизайн-система в <code>:core:ui</code>: токены, тема и переиспользуемые компоненты.</li>
+<li><input disabled="" type="checkbox"> Навигация на типизированных маршрутах, граф собран в <code>:app</code>.</li>
+<li><input disabled="" type="checkbox"> Внедрение зависимостей через Hilt.</li>
+<li><input disabled="" type="checkbox"> Локальные уведомления и базовая интеграция FCM.</li>
+<li><input disabled="" type="checkbox"> Первые unit-тесты и UI-тесты (MockK, MockWebServer, Emulator Suite).</li>
+<li><input disabled="" type="checkbox"> Понимание основных паттернов и причин их применения.</li>
+</ul>
+<blockquote>
+<p>🏆 Я бы считал успехом не идеальную архитектуру, а способность <strong>объяснить каждое решение</strong> и самостоятельно добавить новую функцию, не копируя готовый код.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ <strong>Важный приоритет:</strong> если к концу третьей недели не будет закончена работа с Firestore и Retrofit, лучше перенести FCM на будущее. Работающие локальные напоминания гораздо важнее для первой версии Dayly, чем интеграция push ради самой интеграции.</p>
+</blockquote>
+<hr>
+<h2 id="adr">Архитектурные решения</h2>
+<p>Здесь собраны решения, которые стоит принять <strong>до</strong> того, как проект разрастётся. Каждое можно пересмотреть, но лучше делать это осознанно.</p>
+<h3 id="adr-1">ADR-1. Вертикальные срезы, а не горизонтальные слои</h3>
+<ul>
+<li>Каждая фича — это срез из трёх частей: <code>:domain:&lt;name&gt;:api</code> (контракт), <code>:data:&lt;name&gt;:impl</code> (реализация), <code>:feature:&lt;name&gt;</code> (UI).</li>
+<li><code>:core:*</code> — общие технические модули без бизнес-логики фич.</li>
+<li>Не выноси каждый класс в модуль: модуль нужен там, где есть реальная граница.</li>
+</ul>
+<p><strong>Почему:</strong> срез <code>medications</code> можно менять целиком, не задевая <code>wellness</code>, <code>auth</code> и их UI.</p>
+<h3 id="adr-2">ADR-2. Направление зависимостей</h3>
+<p>Стрелка <code>A → B</code> означает «A зависит от B».</p>
+<pre><code class="language-text">:app → :feature:*            (собирает граф)
+:feature:* → :domain:*:api   (UI знает только контракт)
+:data:*:impl → :domain:*:api + :core:*   (реализация знает контракт и инфраструктуру)
+:app → :data:*:impl          (единственное место, где impl попадает в сборку)
+</code></pre>
+<p><strong>Запрещено:</strong></p>
+<ul>
+<li><code>:domain:*</code> не зависит от <code>:data:*</code>, Android, Room, Firebase и Retrofit.</li>
+<li><code>:feature:*</code> не зависит от <code>:data:*:impl</code> напрямую.</li>
+<li><code>:core:*</code> не зависит от <code>:feature:*</code>.</li>
+<li>Никто не зависит от <code>:app</code>.</li>
+</ul>
+<p><strong>Почему:</strong> пока UI не знает про Room и Firestore, хранилище можно заменить, не переписывая экраны.</p>
+<h3 id="adr-3">ADR-3. <code>api</code> vs <code>implementation</code> — главное Gradle-решение</h3>
+<p>Это ключевая настройка многомодульного проекта. Правила простые:</p>
+<ol>
+<li><strong>По умолчанию — <code>implementation</code>.</strong> Зависимость видна только внутри модуля.</li>
+<li><strong><code>api</code> — только если тип из зависимости попадает в публичную сигнатуру твоего модуля</strong> (публичную функцию, свойство, тип-параметр, базовый класс).</li>
+<li><code>api</code> <strong>протекает транзитивно</strong> и замедляет сборку, поэтому им не пользуются «на всякий случай».</li>
+<li><code>implementation(project(&quot;:x&quot;))</code> <strong>даёт доступ к собственным классам модуля</strong> <code>:x</code>, но не к его зависимостям. Это главная путаница: <code>api</code>/<code>implementation</code> управляют только транзитивными зависимостями, а не самим модулем.</li>
+</ol>
+<p><strong>Тест на <code>api</code>:</strong> если удалить зависимость и публичный код <em>потребителя</em> перестанет компилироваться — нужен <code>api</code>. Если ломается только внутренний код модуля — хватит <code>implementation</code>.</p>
+<p><strong>Типичные случаи в Dayly:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Модуль</th>
+<th>Что в публичной сигнатуре</th>
+<th><code>api(...)</code></th>
+<th><code>implementation(...)</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>:domain:medications:api</code></td>
+<td><code>Flow&lt;List&lt;Medication&gt;&gt;</code> в контракте</td>
+<td><code>kotlinx-coroutines-core</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>:domain:wellness:api</code></td>
+<td><code>Flow&lt;HealthIndex&gt;</code>, <code>HealthIndex</code></td>
+<td><code>kotlinx-coroutines-core</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>:data:medications:impl</code></td>
+<td>ничего (скрыто за интерфейсом)</td>
+<td>—</td>
+<td><code>:domain:medications:api</code>, <code>:core:database</code>, <code>:core:firebase</code>, <code>firebase-firestore</code>, <code>room-*</code>, <code>hilt-android</code></td>
+</tr>
+<tr>
+<td><code>:core:network</code></td>
+<td>свои <code>WeatherApi</code> и DTO</td>
+<td>—</td>
+<td><code>retrofit</code>, <code>okhttp</code>, <code>logging-interceptor</code>, конвертер, <code>kotlinx-serialization-json</code></td>
+</tr>
+<tr>
+<td><code>:core:firebase</code></td>
+<td>—</td>
+<td>—</td>
+<td><code>firebase-firestore</code>, <code>firebase-auth</code></td>
+</tr>
+<tr>
+<td><code>:feature:home</code></td>
+<td>Composable без domain-типов</td>
+<td>—</td>
+<td><code>:domain:wellness:api</code>, Compose, Navigation</td>
+</tr>
+<tr>
+<td><code>:app</code></td>
+<td>—</td>
+<td>—</td>
+<td>все <code>:feature:*</code>, все <code>:data:*:impl</code>, <code>:domain:*:api</code></td>
+</tr>
+</tbody></table>
+<p><strong>Пример: доменный модуль.</strong> Контракт возвращает <code>Flow</code>, значит <code>Flow</code> должен быть доступен потребителю — используем <code>api</code>:</p>
+<pre><code class="language-kotlin">// :domain:medications:api/build.gradle.kts
+plugins {
+    id(&quot;org.jetbrains.kotlin.jvm&quot;)
+    id(&quot;java-library&quot;)   // именно java-library добавляет конфигурацию api
+}
+
+dependencies {
+    // Flow виден в публичных сигнатурах → api
+    api(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-core:COROUTINES_VERSION&quot;)
+    // Ничего лишнего: domain не знает про Android, Room, Firebase и Retrofit.
+}
+</code></pre>
+<p><strong>Пример: модуль реализации.</strong> Наружу торчит только интерфейс, реализация скрыта — везде <code>implementation</code>:</p>
+<pre><code class="language-kotlin">// :data:medications:impl/build.gradle.kts
+plugins {
+    id(&quot;com.android.library&quot;)
+    id(&quot;org.jetbrains.kotlin.android&quot;)
+    id(&quot;com.google.devtools.ksp&quot;)
+    id(&quot;com.google.dagger.hilt.android&quot;)
+}
+
+android { namespace = &quot;com.example.Dayly.data.medications.impl&quot; }
+
+dependencies {
+    implementation(project(&quot;:domain:medications:api&quot;))
+    implementation(project(&quot;:core:database&quot;))
+    implementation(project(&quot;:core:firebase&quot;))
+
+    implementation(platform(&quot;com.google.firebase:firebase-bom:FIREBASE_BOM_VERSION&quot;))
+    implementation(&quot;com.google.firebase:firebase-firestore&quot;)
+
+    implementation(&quot;androidx.room:room-runtime:ROOM_VERSION&quot;)
+    ksp(&quot;androidx.room:room-compiler:ROOM_VERSION&quot;)
+
+    implementation(&quot;com.google.dagger:hilt-android:HILT_VERSION&quot;)
+    ksp(&quot;com.google.dagger:hilt-compiler:HILT_VERSION&quot;)
+}
+</code></pre>
+<p><strong>Пример: транспортный модуль.</strong> Retrofit и OkHttp спрятаны внутри — наружу отдаём свои <code>WeatherApi</code> и DTO:</p>
+<pre><code class="language-kotlin">// :core:network/build.gradle.kts
+plugins {
+    id(&quot;com.android.library&quot;)
+    id(&quot;org.jetbrains.kotlin.android&quot;)
+    id(&quot;org.jetbrains.kotlin.plugin.serialization&quot;)
+}
+
+android { namespace = &quot;com.example.Dayly.core.network&quot; }
+
+dependencies {
+    // Retrofit не появляется в наших публичных сигнатурах → implementation
+    implementation(&quot;com.squareup.retrofit2:retrofit:RETROFIT_VERSION&quot;)
+    implementation(&quot;com.squareup.okhttp3:okhttp:OKHTTP_VERSION&quot;)
+    implementation(&quot;com.squareup.okhttp3:logging-interceptor:OKHTTP_VERSION&quot;)
+    implementation(&quot;com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:RETROFIT_SERIALIZATION_VERSION&quot;)
+    implementation(&quot;org.jetbrains.kotlinx:kotlinx-serialization-json:KOTLINX_SERIALIZATION_VERSION&quot;)
+}
+</code></pre>
+<blockquote>
+<p>⚠️ <strong>Частая ошибка.</strong> Сделать <code>api(project(&quot;:domain:x:api&quot;))</code> в модуле <code>impl</code>, чтобы <code>:app</code> «случайно» увидел domain-модели. Правильнее добавить <code>:domain:x:api</code> в зависимости <code>:app</code> напрямую: так граф честный, а каждый модуль объявляет то, чем пользуется.</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Проверка графа.</strong> Запусти <code>./gradlew :app:dependencies</code> и <code>./gradlew projects</code> — сразу видно, кто что тянет и где нет лишних транзитивных зависимостей.</p>
+</blockquote>
+<h3 id="adr-4">ADR-4. Доменные модули — чистый Kotlin без Android</h3>
+<ul>
+<li><code>:domain:*:api</code> собираются плагином <code>org.jetbrains.kotlin.jvm</code>, а не Android-плагином.</li>
+<li>Никаких <code>Context</code>, <code>R</code>, <code>androidx</code> внутри domain.</li>
+</ul>
+<p><strong>Почему:</strong> тесты domain идут на JVM за миллисекунды, а архитектура остаётся честной. Нужно ли это на старте — вопрос, но переезжать потом больнее. Если хочется проще, можно сделать все модули <code>com.android.library</code>; <code>api</code> доступен и там.</p>
+<h3 id="adr-5">ADR-5. Offline-first: Firestore — источник правды, Room — кэш</h3>
+<ul>
+<li><strong>Чтение:</strong> UI всегда читает из Room (<code>Flow</code>), Room наполняется из Firestore.</li>
+<li><strong>Запись:</strong> сначала локально, затем в Firestore; при отсутствии сети — отложенная отправка.</li>
+<li><strong>Конфликты:</strong> для MVP — last-write-wins по <code>updatedAt</code>.</li>
+</ul>
+<p><strong>Почему:</strong> приложение остаётся быстрым и работоспособным без сети, а облако не блокирует UI.</p>
+<h3 id="adr-6">ADR-6. Внешние данные изолированы</h3>
+<ul>
+<li><code>:core:network</code> — только транспорт: Retrofit, OkHttp, конвертеры. Никакой бизнес-логики.</li>
+<li><code>:data:wellness:impl</code> — маппинг, оркестрация запросов, кэш.</li>
+<li><code>:domain:wellness:api</code> — модели и <strong>чистая</strong> логика (<code>HealthIndexCalculator</code>).</li>
+</ul>
+<p><strong>Почему:</strong> замена Open-Meteo на другой источник — правка одного модуля; UI и расчёт не меняются.</p>
+<h3 id="adr-7">ADR-7. DI-связывание живёт в модуле реализации</h3>
+<ul>
+<li><code>@Binds</code> для «интерфейс → реализация» объявляй в <code>:data:*:impl</code>, а не в <code>:app</code> и не в <code>:domain</code>.</li>
+<li><code>@Provides</code> — для внешних типов: <code>Retrofit</code>, <code>OkHttpClient</code>, <code>FirebaseFirestore</code>, <code>FirebaseAuth</code>.</li>
+<li><code>:app</code> про реализации ничего не знает, кроме строки в Gradle.</li>
+</ul>
+<p><strong>Почему:</strong> модуль сам отвечает за своё внедрение, <code>:app</code> остаётся сборщиком графа.</p>
+<h3 id="adr-8">ADR-8. Версии без Version Catalog</h3>
+<ul>
+<li>Версии живут в <code>build.gradle.kts</code> тех модулей, где нужны.</li>
+<li>Повторяющиеся версии (<code>coroutines</code>, <code>compose</code>, <code>room</code>) держи одинаковыми: либо константой в каждом файле, либо — когда надоест — заведите <code>libs.versions.toml</code> осознанно.</li>
+<li>Правило: <strong>одна версия Kotlin, Compose и AGP на весь проект.</strong></li>
+</ul>
+<p><strong>Почему:</strong> для обучения это прозрачнее, но требует дисциплины, иначе версии разъедутся.</p>
+<h3 id="adr-9">ADR-9. Тестирование по слоям</h3>
+<table>
+<thead>
+<tr>
+<th>Слой</th>
+<th>Что тестируем</th>
+<th>Чем</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>:domain:*</code></td>
+<td>расчёты, use cases</td>
+<td>чистые JVM-тесты</td>
+</tr>
+<tr>
+<td><code>:data:*:impl</code></td>
+<td>мапперы, репозиторий</td>
+<td>MockK, Firebase Emulator Suite</td>
+</tr>
+<tr>
+<td><code>:core:network</code></td>
+<td>сервисы, ошибки</td>
+<td>MockWebServer</td>
+</tr>
+<tr>
+<td><code>:feature:*</code></td>
+<td>ViewModel и UI</td>
+<td>JUnit + Compose UI Test</td>
+</tr>
+<tr>
+<td><code>:app</code></td>
+<td>сценарий целиком</td>
+<td>ручной прогон</td>
+</tr>
+</tbody></table>
+<p><strong>Почему:</strong> чем ниже слой, тем дешевле и быстрее тест; пирамида тестов остаётся пирамидой.</p>
+<h3 id="adr-10">ADR-10. Однонаправленный поток данных (UDF)</h3>
+<ul>
+<li>У экрана одно состояние: <code>UiState</code> (<code>Loading</code> / <code>Empty</code> / <code>Content</code> / <code>Error</code>).</li>
+<li>UI шлёт события в ViewModel, ViewModel меняет состояние, UI перерисовывается.</li>
+<li>Compose не хранит бизнес-состояние, только локальное UI-состояние.</li>
+</ul>
+<p><strong>Почему:</strong> предсказуемые экраны без «двух источников правды».</p>
+<h3 id="adr-11">ADR-11. Дизайн-система в <code>:core:ui</code></h3>
+<ul>
+<li>Токены, тема и переиспользуемые компоненты живут в <code>:core:ui</code>, который зависит только от Compose — не от domain, data и Firebase.</li>
+<li>Экраны <code>:feature:*</code> собираются из компонентов и токенов: ни «сырых» цветов, ни магических <code>dp</code>, ни собственных кнопок.</li>
+<li>API компонентов: корневой <code>modifier</code> (размещением владеет вызывающий), слоты для переменного контента, примитивы — только для смысловых контрактов.</li>
+</ul>
+<p><strong>Почему:</strong> дизайн описывается один раз; смена темы или кнопки — правка в одном модуле, а не по всем экранам. Подробности — в <a href="#design-system">разделе 7</a>.</p>
+<h3 id="adr-12">ADR-12. Навигация на типизированных маршрутах</h3>
+<ul>
+<li>Маршрут — это <code>@Serializable</code> тип, а не строка; аргументы — поля этого типа.</li>
+<li>Через маршрут передаются только идентификаторы; сами данные экран получает из репозитория.</li>
+<li><code>NavHost</code> и связывание фич живут в <code>:app</code>: фичи не знают друг о друге.</li>
+<li>Навигация «после действия» — одноразовое событие из ViewModel через <code>Channel</code>, а не флаг в состоянии.</li>
+</ul>
+<p><strong>Почему:</strong> переходы проверяются компилятором, аргументы нельзя рассинхронизировать, а граф остаётся в одном месте. Подробности — в <a href="#navigation">разделе 8</a>.</p>
+<hr>
+<h2 id="stack">1. Технологический стек</h2>
+<table>
+<thead>
+<tr>
+<th>Область</th>
+<th>Технология</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Язык</td>
+<td>Kotlin</td>
+</tr>
+<tr>
+<td>UI</td>
+<td>Jetpack Compose + Material 3</td>
+</tr>
+<tr>
+<td>Архитектура</td>
+<td>Clean Architecture + MVVM + UDF</td>
+</tr>
+<tr>
+<td>Асинхронность</td>
+<td>Coroutines, Flow, StateFlow</td>
+</tr>
+<tr>
+<td>Навигация</td>
+<td>Navigation Compose (типизированные маршруты)</td>
+</tr>
+<tr>
+<td>DI</td>
+<td>Hilt</td>
+</tr>
+<tr>
+<td>Аутентификация</td>
+<td>Firebase Authentication (email, Google)</td>
+</tr>
+<tr>
+<td>Хранение данных пользователя</td>
+<td>Cloud Firestore</td>
+</tr>
+<tr>
+<td>Локальный кэш</td>
+<td>Room + KSP</td>
+</tr>
+<tr>
+<td>Внешние данные</td>
+<td>Retrofit + OkHttp + kotlinx.serialization (Open-Meteo)</td>
+</tr>
+<tr>
+<td>Метрика самочувствия</td>
+<td>Чистая domain-логика на Kotlin</td>
+</tr>
+<tr>
+<td>Локальные напоминания</td>
+<td>AlarmManager</td>
+</tr>
+<tr>
+<td>Фоновая синхронизация</td>
+<td>Firestore offline persistence + WorkManager</td>
+</tr>
+<tr>
+<td>Push-уведомления</td>
+<td>Firebase Cloud Messaging</td>
+</tr>
+<tr>
+<td>Тестирование</td>
+<td>JUnit, MockK, MockWebServer, Compose UI Test, Firebase Emulator Suite</td>
+</tr>
+<tr>
+<td>Сборка</td>
+<td>Gradle Kotlin DSL, <code>build.gradle.kts</code>, без Version Catalog</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>ℹ️ <strong>Разделение ответственности.</strong> Firestore — хранилище данных пользователя. Retrofit/OkHttp — внешний публичный API (погода). Расчёт метрики — обычная Kotlin-функция без Android и сети.</p>
+</blockquote>
+<hr>
+<h2 id="architecture">2. Архитектура проекта</h2>
+<p>Разделение на <code>api</code> и <code>impl</code> — но не каждый класс в отдельный модуль. Начни с такой структуры:</p>
+<pre><code class="language-text">Dayly/
+├── app/
+│
+├── core/
+│   ├── common/
+│   ├── ui/                # дизайн-система: токены, тема, компоненты
+│   ├── database/          # Room: локальный кэш и расписания напоминаний
+│   ├── network/           # Retrofit + OkHttp: внешний REST API
+│   ├── firebase/          # Firestore и Firebase Authentication
+│   └── notifications/
+│
+├── domain/
+│   ├── auth/
+│   │   └── api/
+│   ├── wellness/          # погода, качество воздуха и индекс самочувствия
+│   │   └── api/
+│   ├── medications/
+│   │   └── api/
+│   ├── habits/
+│   │   └── api/
+│   └── sleep/
+│       └── api/
+│
+├── data/
+│   ├── auth/
+│   │   └── impl/
+│   ├── wellness/
+│   │   └── impl/
+│   ├── medications/
+│   │   └── impl/
+│   ├── habits/
+│   │   └── impl/
+│   └── sleep/
+│       └── impl/
+│
+└── feature/
+    ├── auth/
+    ├── home/
+    ├── medications/
+    ├── habits/
+    ├── sleep/
+    └── settings/
+</code></pre>
+<blockquote>
+<p>💡 Каждая папка с <code>build.gradle.kts</code> — отдельный Gradle-модуль.</p>
+</blockquote>
+<h3>Как будут связаны модули</h3>
+<pre><code class="language-text">                        :app
+         +---------------+--------------+
+         |               |              |
+ :feature:auth   :feature:home   :feature:medications
+         |               |              |
+         v               v              v
+ :domain:auth:api :domain:wellness:api :domain:medications:api
+         ^               ^              ^
+         |               |              |
+ :data:auth:impl :data:wellness:impl :data:medications:impl
+         |               |              |
+         v               v              v
+   :core:firebase   :core:network  :core:database
+                                     :core:firebase
+</code></pre>
+<p>Подробнее о направлении стрелок и запретах — в <a href="#adr-2">ADR-2</a>, о том, что писать в <code>api</code>, а что в <code>implementation</code>, — в <a href="#adr-3">ADR-3</a>.</p>
+<p><strong>Например, публичные контракты:</strong></p>
+<pre><code class="language-kotlin">interface MedicationRepository {
+    fun observeAll(): Flow&lt;List&lt;Medication&gt;&gt;
+
+    suspend fun add(medication: Medication)
+
+    suspend fun markAsTaken(id: String)
+}
+
+interface AuthRepository {
+    val currentUser: Flow&lt;User?&gt;
+
+    suspend fun signInWithEmail(email: String, password: String)
+
+    suspend fun signOut()
+}
+
+interface WellnessRepository {
+    fun observeHealthIndex(): Flow&lt;HealthIndex&gt;
+
+    suspend fun refresh(location: Coordinates)
+}
+</code></pre>
+<p><strong>Расчёт метрики — чистая функция в domain-слое:</strong></p>
+<pre><code class="language-kotlin">interface HealthIndexCalculator {
+    fun compute(weather: WeatherSnapshot, air: AirQualitySnapshot): HealthIndex
+}
+</code></pre>
+<p><strong>Реализации:</strong></p>
+<pre><code class="language-kotlin">class MedicationRepositoryImpl(
+    private val dao: MedicationDao,             // Room: локальный кэш
+    private val remote: MedicationRemoteSource, // Firestore
+) : MedicationRepository {
+    // Читаем из Room, пишем в Firestore и обновляем кэш.
+}
+
+class WellnessRepositoryImpl(
+    private val weatherApi: WeatherApi,             // Retrofit
+    private val airQualityApi: AirQualityApi,       // Retrofit
+    private val calculator: HealthIndexCalculator,  // таблица расчёта
+    private val dao: WellnessDao,                   // кэш последнего расчёта
+) : WellnessRepository {
+    override suspend fun refresh(location: Coordinates) {
+        val weather = weatherApi.forecast(location).toDomain()
+        val air = airQualityApi.current(location).toDomain()
+        dao.upsert(calculator.compute(weather, air).toEntity())
+    }
+}
+</code></pre>
+<p><strong>Интерфейсы Retrofit-сервисов:</strong></p>
+<pre><code class="language-kotlin">interface WeatherApi {
+    @GET(&quot;v1/forecast&quot;)
+    suspend fun forecast(
+        @Query(&quot;latitude&quot;) latitude: Double,
+        @Query(&quot;longitude&quot;) longitude: Double,
+        @Query(&quot;current&quot;) current: String = &quot;temperature_2m,apparent_temperature,&quot;
+            + &quot;relative_humidity_2m,surface_pressure,uv_index,wind_speed_10m&quot;,
+    ): WeatherDto
+}
+
+interface AirQualityApi {
+    @GET(&quot;v1/air-quality&quot;)
+    suspend fun current(
+        @Query(&quot;latitude&quot;) latitude: Double,
+        @Query(&quot;longitude&quot;) longitude: Double,
+        @Query(&quot;current&quot;) current: String = &quot;pm2_5,pm10,birch_pollen,grass_pollen&quot;,
+    ): AirQualityDto
+}
+</code></pre>
+<p><strong>В приложении подключаешь нужные реализации:</strong></p>
+<pre><code class="language-kotlin">dependencies {
+    implementation(project(&quot;:feature:medications&quot;))
+    implementation(project(&quot;:feature:auth&quot;))
+    implementation(project(&quot;:feature:home&quot;))
+
+    implementation(project(&quot;:data:medications:impl&quot;))
+    implementation(project(&quot;:data:auth:impl&quot;))
+    implementation(project(&quot;:data:wellness:impl&quot;))
+
+    // Доменные контракты — явно, если :app их использует напрямую.
+    implementation(project(&quot;:domain:medications:api&quot;))
+}
+</code></pre>
+<blockquote>
+<p>💡 <code>feature:home</code> зависит от <code>domain:wellness:api</code>, а не от Retrofit-сервиса. Заменишь Open-Meteo на другой источник — UI не изменится, потому что индекс самочувствия останется той же моделью.</p>
+</blockquote>
+<h3>Как подключить новый модуль</h3>
+<p>Модуль — это <strong>папка + свой <code>build.gradle.kts</code> + строка в <code>settings.gradle.kts</code></strong>. Пока модуля нет в <code>settings.gradle.kts</code>, для Gradle его не существует, даже если папка и файл на месте.</p>
+<p><strong>Три шага</strong></p>
+<ol>
+<li>Создать папку и <code>build.gradle.kts</code> (в Android Studio: <strong>File → New → Module → Android Library</strong> — он сделает и папку, и файл, и <code>include</code>).</li>
+<li>Зарегистрировать в <code>settings.gradle.kts</code>: <code>include(&quot;:core:database&quot;)</code>.</li>
+<li>Подключить как зависимость там, где он нужен: <code>implementation(project(&quot;:core:database&quot;))</code>.</li>
+</ol>
+<p><strong>Правила путей</strong></p>
+<ul>
+<li>Двоеточие в <code>include</code> — это вложенность папок: <code>domain/medications/api</code> → <code>:domain:medications:api</code>.</li>
+<li>Промежуточные папки (<code>domain</code>, <code>domain/medications</code>) модулями не становятся: <code>build.gradle.kts</code> в них не нужен.</li>
+<li>Имя папки должно совпадать с последним сегментом пути (иначе <code>projectDir</code> придётся задавать вручную).</li>
+</ul>
+<pre><code class="language-kotlin">// settings.gradle.kts — только leaf-модули
+rootProject.name = &quot;Dayly&quot;
+
+include(&quot;:app&quot;)
+
+include(&quot;:core:ui&quot;)
+include(&quot;:core:database&quot;)
+
+include(&quot;:domain:medications:api&quot;)
+include(&quot;:data:medications:impl&quot;)
+include(&quot;:feature:medications&quot;)
+</code></pre>
+<p><strong>Android-библиотека</strong> — например <code>core/ui/build.gradle.kts</code>:</p>
+<pre><code class="language-kotlin">plugins {
+    alias(libs.plugins.android.library)   // Android Library, а не Application
+}
+
+android {
+    namespace = &quot;com.denalal.dayly.core.ui&quot;   // уникальный, продолжение app-namespace
+    compileSdk { version = release(37) }
+    defaultConfig { minSdk = 24 }
+    buildFeatures { compose = true }
+}
+
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui)
+}
+</code></pre>
+<p><strong>Чистый Kotlin-модуль</strong> — например <code>domain/medications/api/build.gradle.kts</code>. Здесь нет <code>android { }</code>, зато доступна конфигурация <code>api</code> (см. <a href="#adr-3">ADR-3</a>):</p>
+<pre><code class="language-kotlin">plugins {
+    alias(libs.plugins.kotlin.jvm)
+    id(&quot;java-library&quot;)   // именно он добавляет конфигурацию api
+}
+
+dependencies {
+    api(&quot;org.jetbrains.kotlinx:kotlinx-coroutines-core:COROUTINES_VERSION&quot;)
+}
+</code></pre>
+<p><strong>Подключение в <code>app/build.gradle.kts</code>:</strong></p>
+<pre><code class="language-kotlin">dependencies {
+    implementation(project(&quot;:core:ui&quot;))
+    implementation(project(&quot;:feature:medications&quot;))
+    implementation(project(&quot;:data:medications:impl&quot;))
+}
+</code></pre>
+<blockquote>
+<p>💡 Плагины <code>android.library</code> и <code>kotlin.jvm</code> должны быть объявлены в <code>gradle/libs.versions.toml</code> (или указаны версией прямо в модуле) — в примерах выше они взяты через <code>alias(libs.plugins.*)</code>, как в самом проекте.</p>
+</blockquote>
+<blockquote>
+<p>💡 <code>namespace</code> у каждого модуля — свой и уникальный: <code>com.denalal.dayly.core.ui</code>, <code>com.denalal.dayly.feature.medications</code>. Два модуля с одинаковым namespace Gradle не соберёт.</p>
+</blockquote>
+<blockquote>
+<p>💡 <code>compileSdk</code>, <code>minSdk</code> и версию Kotlin держи одинаковыми во всех Android-модулях — иначе получаешь странные ошибки сборки.</p>
+</blockquote>
+<blockquote>
+<p>💡 Начни с одного-двух модулей: <code>:core:ui</code> (тема и компоненты) и один вертикальный срез <code>domain</code> → <code>data</code> → <code>feature</code>. Остальное — только когда появится реальная граница.</p>
+</blockquote>
+<hr>
+<h2 id="background">3. Как разобраться с фоновыми уведомлениями</h2>
+<p>Здесь принципиально важно <strong>не смешивать три механизма</strong>:</p>
+<ul>
+<li><strong><code>AlarmManager</code></strong> — для напоминаний, которые должны сработать в определённое время, с учётом ограничений Android и разрешений на точные будильники.</li>
+<li><strong><code>WorkManager</code></strong> — для отложенной синхронизации и задач, которые не требуют выполнения в точную минуту.</li>
+<li><strong>Firebase Cloud Messaging (FCM)</strong> — для удалённых push-сообщений от сервера.</li>
+</ul>
+<h3>Пример сценария</h3>
+<ol>
+<li>Пользователь создаёт расписание лекарства на 21:00.</li>
+<li>Расписание сохраняется в Firestore и в Room.</li>
+<li>Приложение планирует локальное уведомление.</li>
+<li>Android показывает уведомление, даже когда Activity закрыта.</li>
+<li>После нажатия «Принял» результат сохраняется в Room.</li>
+<li>При появлении сети Firestore синхронизирует изменение с облаком (offline persistence).</li>
+</ol>
+<p>Локальные уведомления не требуют постоянно работающего процесса приложения. Но нужно учитывать перезагрузку устройства, разрешения на уведомления, точные будильники и ограничения энергосбережения.</p>
+<blockquote>
+<p>💡 FCM нужен, если сервер должен присылать новые события, например синхронизацию расписания с другого устройства или сообщение от Cloud Functions. Для ежедневных напоминаний локальные уведомления остаются основным механизмом.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ Не полагайся на FCM для точных напоминаний: push может прийти с задержкой или не прийти вовсе. Точное время — это всегда <code>AlarmManager</code>.</p>
+</blockquote>
+<hr>
+<h2 id="kotlin-compose">4. Что ты изучишь в Kotlin и Compose</h2>
+<p>Предлагаю изучать темы по мере появления конкретных задач.</p>
+<table>
+<thead>
+<tr>
+<th>Тема</th>
+<th>Практическая задача</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data class</code>, <code>enum</code>, <code>sealed interface</code></td>
+<td>Модели самочувствия и состояния UI</td>
+</tr>
+<tr>
+<td>Null safety, extension functions</td>
+<td>Обработка данных погоды</td>
+</tr>
+<tr>
+<td>Generics, interfaces, delegation</td>
+<td>Контракты и переиспользование</td>
+</tr>
+<tr>
+<td>Coroutines, <code>suspend</code></td>
+<td>Запросы к Firestore, Firebase Auth и Retrofit</td>
+</tr>
+<tr>
+<td><code>Flow</code>, <code>StateFlow</code></td>
+<td>Наблюдение за Room, snapshot listeners Firestore, состояние UI</td>
+</tr>
+<tr>
+<td><code>remember</code>, <code>rememberSaveable</code></td>
+<td>Локальное состояние Compose</td>
+</tr>
+<tr>
+<td><code>LaunchedEffect</code></td>
+<td>Эффекты UI</td>
+</tr>
+<tr>
+<td>ViewModel, lifecycle</td>
+<td>Управление состоянием экрана</td>
+</tr>
+<tr>
+<td>Navigation Compose, типизированные маршруты</td>
+<td>Граф экранов и аргументы без строк</td>
+</tr>
+<tr>
+<td>Hilt</td>
+<td>Внедрение зависимостей</td>
+</tr>
+<tr>
+<td>Room, SQL, миграции</td>
+<td>Локальный кэш данных</td>
+</tr>
+<tr>
+<td>Firebase SDK: Firestore, Auth</td>
+<td>Облачное хранилище и вход пользователя</td>
+</tr>
+<tr>
+<td>Retrofit, OkHttp</td>
+<td>Внешний REST, интерсепторы и логирование</td>
+</tr>
+<tr>
+<td>kotlinx.serialization</td>
+<td>Парсинг JSON погоды и качества воздуха</td>
+</tr>
+<tr>
+<td>MockWebServer</td>
+<td>Тестирование сетевого слоя без реальной сети</td>
+</tr>
+<tr>
+<td>Gradle <code>api</code> / <code>implementation</code></td>
+<td>Границы модулей и скорость сборки</td>
+</tr>
+<tr>
+<td>Design tokens, тема, slot-API</td>
+<td><code>:core:ui</code> и переиспользуемые компоненты</td>
+</tr>
+<tr>
+<td>Gradle Kotlin DSL</td>
+<td>Настройка модулей и зависимостей</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 Из паттернов я бы обязательно применил <strong>Repository, MVVM, Use Case, Dependency Injection, Observer, Adapter/Mapper и Strategy</strong>. Factory и Facade добавлял бы только там, где есть реальная необходимость.</p>
+</blockquote>
+<hr>
+<h2 id="firebase">5. Firebase, внешний REST и самочувствие</h2>
+<p>Backend у проекта — Firebase, а Retrofit тянет внешнюю погоду. Ключевые решения:</p>
+<ul>
+<li><strong>Аутентификация</strong> — только Firebase Authentication. Экран входа показывает состояние из <code>FirebaseAuth</code> через <code>AuthRepository</code>, навигация реагирует на <code>currentUser</code>.</li>
+<li><strong>Данные пользователя</strong> — сгруппированы под его <code>uid</code>, чтобы security rules ограничивали доступ автоматически.</li>
+<li><strong>Внешние данные</strong> — Retrofit + OkHttp ходит в публичный API <strong>Open-Meteo</strong> за погодой и качеством воздуха. К своим пользовательским данным через Retrofit не обращаемся.</li>
+</ul>
+<p><strong>Структура Firestore:</strong></p>
+<pre><code class="language-text">users/{uid}/
+├── medications/{medicationId}
+├── habits/{habitId}
+└── sleep/{date}
+</code></pre>
+<p><strong>Security rules (каждый видит только свои данные):</strong></p>
+<pre><code class="language-javascript">rules_version = &#39;2&#39;;
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null
+                         &amp;&amp; request.auth.uid == userId;
+    }
+  }
+}
+</code></pre>
+<ul>
+<li><strong>Чтение данных</strong> — <code>snapshots()</code> для реактивного UI и <code>get()</code> для одноразовых запросов.</li>
+<li><strong>Никакого REST-слоя для своих данных</strong> — репозиторий вызывает Firebase SDK напрямую. Fake-реализация <code>Repository</code> живёт только в тестах.</li>
+<li><strong>Модель данных</strong> — один <code>data class</code> на документ, <code>@DocumentId</code> для идентификатора, поле <code>updatedAt</code> для разрешения конфликтов.</li>
+<li><strong>Офлайн</strong> — Firestore offline persistence для данных пользователя и кэш последнего индекса в Room для внешнего API.</li>
+</ul>
+<h3>Индекс самочувствия</h3>
+<p>Идея: погода влияет на самочувствие, поэтому из внешних данных считается одна метрика <strong>0–100</strong> плюс список факторов с уровнем риска и подсказкой. Это чистый Kotlin — без сети, Android и Firebase, поэтому идеально тестируется.</p>
+<p><strong>Входные данные:</strong> температура и ощущаемая температура, влажность, атмосферное давление и его тренд, УФ-индекс, ветер, вероятность осадков, PM2.5/PM10 и пыльца.</p>
+<p><strong>Факторы и правила (пример):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Фактор</th>
+<th>Триггер</th>
+<th>Что показывает</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>🧠 Головная боль</td>
+<td>резкое падение давления (&gt; 6 гПа за 6 ч)</td>
+<td>«Возможна головная боль»</td>
+</tr>
+<tr>
+<td>💧 Обезвоживание</td>
+<td>жара ≥ 28 °C и влажность &lt; 40 %</td>
+<td>«Пей больше воды»</td>
+</tr>
+<tr>
+<td>🦴 Суставы</td>
+<td>низкое давление + холод + высокая влажность</td>
+<td>«Дискомфорт в суставах»</td>
+</tr>
+<tr>
+<td>🫁 Дыхание и аллергия</td>
+<td>PM2.5 выше нормы, пыльца, сухой воздух</td>
+<td>«Риск для дыхания»</td>
+</tr>
+<tr>
+<td>😴 Комфорт сна</td>
+<td>ночная температура вне 16–19 °C, влажность вне 40–60 %</td>
+<td>«Условия для сна»</td>
+</tr>
+<tr>
+<td>☀️ УФ-нагрузка</td>
+<td><code>uv_index</code> ≥ 6</td>
+<td>«Защита от солнца»</td>
+</tr>
+</tbody></table>
+<p><strong>Модель результата:</strong></p>
+<pre><code class="language-kotlin">data class HealthIndex(
+    val score: Int,                    // 0..100
+    val headline: String,              // «Умеренный риск головной боли»
+    val factors: List&lt;HealthFactor&gt;,
+    val updatedAt: Instant,
+)
+
+data class HealthFactor(
+    val kind: HealthFactorKind,        // HEADACHE, HYDRATION, JOINTS, RESPIRATORY, SLEEP, UV
+    val level: Level,                  // LOW, MODERATE, HIGH
+    val advice: String,
+)
+</code></pre>
+<p><strong>Где это видно в приложении:</strong></p>
+<ul>
+<li><strong>Главный экран</strong> — карточка «Самочувствие сегодня»: индекс, главный фактор и совет.</li>
+<li><strong>Экран сна</strong> — фактор <code>SLEEP</code>, чтобы было понятно, как погода влияет на качество сна.</li>
+<li><strong>Напоминания о лекарствах</strong> — контекстная подсказка для аллергии или астмы, если поднялся фактор <code>RESPIRATORY</code>.</li>
+</ul>
+<blockquote>
+<p>💡 Open-Meteo бесплатный и <strong>не требует API-ключа</strong>, а прогноз и качество воздуха — это два отдельных эндпоинта, то есть два Retrofit-сервиса и хорошая практика с несколькими источниками.</p>
+</blockquote>
+<blockquote>
+<p>💡 Координаты бери из настроек (город пользователя) как самый простой вариант. Подключать геолокацию (<code>FusedLocationProvider</code> + разрешения) можно позже — это отдельная тема.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ Публичный API — чужой и нестабильный: он может тормозить, вернуть ошибку или измениться. Поэтому кэшируй последний индекс в Room и не показывай пустой экран при сбое сети.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ Индекс самочувствия — это не медицинская рекомендация. Формулируй подсказки мягко и не обещай диагнозов.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ Никогда не храни в приложении ключи и не отключай security rules «для отладки». Правила — единственная защита данных, раз backend-кода у тебя нет.</p>
+</blockquote>
+<hr>
+<h2 id="dependencies">6. Как подключать зависимости без <code>libs.versions.toml</code></h2>
+<p><strong>В корневом <code>build.gradle.kts</code> можно объявить версии плагинов:</strong></p>
+<pre><code class="language-kotlin">plugins {
+    id(&quot;com.android.application&quot;) version &quot;AGP_VERSION&quot; apply false
+    id(&quot;com.android.library&quot;) version &quot;AGP_VERSION&quot; apply false
+    id(&quot;org.jetbrains.kotlin.android&quot;) version &quot;KOTLIN_VERSION&quot; apply false
+    id(&quot;org.jetbrains.kotlin.jvm&quot;) version &quot;KOTLIN_VERSION&quot; apply false
+    id(&quot;org.jetbrains.kotlin.plugin.compose&quot;) version &quot;KOTLIN_VERSION&quot; apply false
+    id(&quot;org.jetbrains.kotlin.plugin.serialization&quot;) version &quot;KOTLIN_VERSION&quot; apply false
+    id(&quot;com.google.devtools.ksp&quot;) version &quot;KSP_VERSION&quot; apply false
+    id(&quot;com.google.dagger.hilt.android&quot;) version &quot;HILT_VERSION&quot; apply false
+    id(&quot;com.google.gms.google-services&quot;) version &quot;GOOGLE_SERVICES_VERSION&quot; apply false
+}
+</code></pre>
+<p><strong>В модуле приложения:</strong></p>
+<pre><code class="language-kotlin">plugins {
+    id(&quot;com.android.application&quot;)
+    id(&quot;org.jetbrains.kotlin.android&quot;)
+    id(&quot;org.jetbrains.kotlin.plugin.compose&quot;)
+    id(&quot;com.google.devtools.ksp&quot;)
+    id(&quot;com.google.dagger.hilt.android&quot;)
+    id(&quot;com.google.gms.google-services&quot;)
+}
+
+android {
+    namespace = &quot;com.example.Dayly&quot;
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = &quot;com.example.Dayly&quot;
+        minSdk = 26
+        targetSdk = 36
+    }
+
+    buildFeatures {
+        compose = true
+    }
+}
+
+dependencies {
+    implementation(&quot;androidx.compose.ui:ui:UI_VERSION&quot;)
+    implementation(&quot;androidx.compose.material3:material3:MATERIAL3_VERSION&quot;)
+
+    implementation(&quot;androidx.lifecycle:lifecycle-viewmodel-compose:LIFECYCLE_VERSION&quot;)
+    implementation(&quot;androidx.navigation:navigation-compose:NAVIGATION_VERSION&quot;)
+
+    // Firebase: версии управляются через BoM, поэтому у артефактов их нет.
+    implementation(platform(&quot;com.google.firebase:firebase-bom:FIREBASE_BOM_VERSION&quot;))
+    implementation(&quot;com.google.firebase:firebase-auth&quot;)
+    implementation(&quot;com.google.firebase:firebase-firestore&quot;)
+    implementation(&quot;com.google.firebase:firebase-messaging&quot;)
+
+    // Hilt
+    implementation(&quot;com.google.dagger:hilt-android:HILT_VERSION&quot;)
+    ksp(&quot;com.google.dagger:hilt-compiler:HILT_VERSION&quot;)
+
+    implementation(project(&quot;:feature:medications&quot;))
+    implementation(project(&quot;:feature:auth&quot;))
+    implementation(project(&quot;:feature:home&quot;))
+
+    implementation(project(&quot;:data:medications:impl&quot;))
+    implementation(project(&quot;:data:auth:impl&quot;))
+    implementation(project(&quot;:data:wellness:impl&quot;))
+
+    implementation(project(&quot;:domain:medications:api&quot;))
+}
+</code></pre>
+<blockquote>
+<p>⚠️ Обозначения <code>*_VERSION</code> нужно заменить конкретными совместимыми версиями. Это <strong>шаблон, а не готовый к сборке файл</strong>: понадобится ещё <code>google-services.json</code> в модуле <code>app</code>, KSP для Room в том модуле, где объявлена база, и, при желании, Firebase Emulator Suite.</p>
+<p>💡 Артефакты <code>firebase-*</code> указывай без суффикса <code>-ktx</code>: расширения для Kotlin уже входят в основные модули, а отдельные KTX-пакеты устарели.</p>
+<p>💡 <code>retrofit2-kotlinx-serialization-converter</code> — не единственный вариант: вместо него можно взять <code>converter-gson</code> или <code>converter-moshi</code>, если они тебе привычнее.</p>
+<p>💡 Порядок <code>api</code>/<code>implementation</code> для каждого модуля разобран в <a href="#adr-3">ADR-3</a>.</p>
+</blockquote>
+<hr>
+<h2 id="design-system">7. Дизайн-система и переиспользуемый UI</h2>
+<p>Цель — описать дизайн <strong>один раз</strong> и дальше только переиспользовать. Экран не должен знать ни цветов, ни отступов, ни «своей» кнопки: всё это живёт в <code>:core:ui</code>.</p>
+<h3>Что где лежит</h3>
+<ul>
+<li><strong><code>:core:ui</code></strong> — токены, тема и базовые компоненты. Зависит только от Compose: ни domain-моделей, ни бизнес-логики, ни Firebase.</li>
+<li><strong><code>:feature:*</code></strong> — собирает экран из компонентов <code>:core:ui</code> и, при необходимости, добавляет свои экранные блоки.</li>
+</ul>
+<h3>Токены</h3>
+<p>Дизайн начинается не с компонентов, а с токенов — иначе значения разъедутся по файлам.</p>
+<ul>
+<li><strong>Цвета</strong> — через <code>ColorScheme</code> Material 3: в экране <code>MaterialTheme.colorScheme.primary</code>, а не <code>Color(0xFF3F51B5)</code>.</li>
+<li><strong>Типографика</strong> — <code>Typography</code> плюс пара своих стилей (заголовок, тело, подпись).</li>
+<li><strong>Отступы</strong> — Material их не даёт, поэтому заведи <code>LocalSpacing</code> или объект с шагом <code>4/8/12/16/24 dp</code>. Без этого по экранам поползут магические числа.</li>
+<li><strong>Формы и тень</strong> — <code>Shapes</code> и <code>Elevation</code>; светлая и тёмная тема — одна тема с двумя наборами значений.</li>
+</ul>
+<pre><code class="language-kotlin">@Composable
+fun DaylyTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -&gt; Unit,
+) {
+    CompositionLocalProvider(
+        LocalSpacing provides if (darkTheme) DarkSpacing else LightSpacing,
+    ) {
+        MaterialTheme(
+            colorScheme = if (darkTheme) DarkColors else LightColors,
+            typography = DaylyTypography,
+            shapes = DaylyShapes,
+            content = content,
+        )
+    }
+}
+</code></pre>
+<h3>Правила API компонентов</h3>
+<ul>
+<li><strong>Корневой <code>modifier: Modifier = Modifier</code></strong> — обязателен и ставится на корень композиции. Размещение (<code>fillMaxWidth</code>, экранные отступы, выравнивание) — забота вызывающего, а не компонента.</li>
+<li><strong>Порядок модификаторов:</strong> сначала пришедший извне, затем собственные «личные» (<code>clip</code>, размер по умолчанию).</li>
+<li><strong>Слоты вместо флагов:</strong> переменный контент — это <code>@Composable () -&gt; Unit</code>, а не набор <code>showLeading</code>/<code>showIcon</code>.</li>
+<li><strong>Необязательный слот — nullable с <code>null</code> по умолчанию</strong>, чтобы вместе с ним исчезали контейнер и его отступы.</li>
+<li><strong>Примитивы остаются там, где есть смысловой контракт</strong> (например, уровень риска), а не «на всякий случай».</li>
+<li><strong>Повторяющиеся значения и дефолты — в <code>XxxDefaults</code>.</strong></li>
+</ul>
+<pre><code class="language-kotlin">@Composable
+fun DaylyCard(
+    content: @Composable ColumnScope.() -&gt; Unit,
+    modifier: Modifier = Modifier,
+    onClick: (() -&gt; Unit)? = null,
+    leadingContent: (@Composable () -&gt; Unit)? = null,
+    trailingContent: (@Composable () -&gt; Unit)? = null,
+)
+</code></pre>
+<h3>Минимальный набор на старте</h3>
+<p><code>DaylyScaffold</code>, <code>DaylyTopBar</code>, <code>DaylyCard</code>, <code>DaylyButton</code>, <code>DaylyTextField</code>, <code>DaylyListItem</code>. Отдельно — <code>EmptyState</code>, <code>ErrorState</code>, <code>LoadingState</code>: они окупятся на каждом экране и заодно снимут вопрос «что рисовать, пока грузится».</p>
+<h3>Превью как каталог</h3>
+<p>Каждый компонент — с <code>@Preview</code> внутри <code>DaylyTheme</code>. Это живой каталог без отдельного приложения: меняешь токен — видишь последствия во всех состояниях. Позже сюда же ложатся screenshot-тесты, поэтому превью — не украшение, а точка опоры.</p>
+<h3>Чего не делать</h3>
+<ul>
+<li><strong>Не заводить компонент под каждый экран.</strong> Компонент появляется на втором-третьем использовании; до этого он живёт в фиче.</li>
+<li><strong>Не тащить в <code>:core:ui</code> доменные модели</strong> (<code>Medication</code>, <code>HealthIndex</code>): иначе UI-модуль начнёт зависеть от domain и перестанет быть переиспользуемым.</li>
+<li><strong>Не хардкодить цвета и <code>dp</code> в экранах</strong> — это первый признак, что дизайн-система не прижилась.</li>
+<li><strong>Не строить флаг-матрицу</strong> (<code>isPrimary</code>, <code>isLarge</code>, <code>hasIcon</code>…) для одного компонента: обычно это два разных компонента или один слот.</li>
+</ul>
+<h3>Порядок зависимости</h3>
+<pre><code class="language-text">:feature:* → :core:ui            (экраны используют компоненты и тему)
+:app       → :core:ui            (тема на самом верху, вокруг NavHost)
+:core:ui   → только Compose      (никаких domain, data, Firebase)
+</code></pre>
+<blockquote>
+<p>💡 Тема оборачивает приложение один раз, в <code>:app</code>, вокруг <code>NavHost</code> — тогда ни один экран не занимается настройкой цветов и типографики.</p>
+</blockquote>
+<hr>
+<h2 id="navigation">8. Навигация: типизированные маршруты</h2>
+<p>Навигация — это не «переходы между экранами», а <strong>состояние</strong>: <code>NavController</code> хранит back stack, а Compose перерисовывает то, что наверху. Отсюда всё остальное.</p>
+<h3>Почему не строки</h3>
+<ul>
+<li>Строку не проверяет компилятор: опечатка вылезает в рантайме как «destination not found».</li>
+<li>Аргументы (<code>&quot;medications/{id}&quot;</code> + <code>arguments = listOf(...)</code>) легко рассинхронизировать с кодом.</li>
+<li>Рефакторинг имени экрана не находит все использования.</li>
+</ul>
+<p>С type-safe API маршрут — это <strong>тип</strong>. Переход <code>navigate(MedicationDetails(id))</code> не скомпилируется, если аргумент забыт или имеет не тот тип. Типизированные маршруты используют kotlinx.serialization, плагин которого в проекте уже стоит.</p>
+<h3>Основы</h3>
+<pre><code class="language-kotlin">@Serializable data object Home
+@Serializable data object Medications
+@Serializable data class MedicationDetails(val id: String)
+@Serializable data object SleepSettings
+
+NavHost(navController = navController, startDestination = Home) {
+    composable&lt;Home&gt; {
+        HomeScreen(onOpenMedications = { navController.navigate(Medications) })
+    }
+    composable&lt;Medications&gt; {
+        MedicationsScreen(
+            onItemClick = { id -&gt; navController.navigate(MedicationDetails(id)) },
+        )
+    }
+    composable&lt;MedicationDetails&gt; { entry -&gt;
+        val route = entry.toRoute&lt;MedicationDetails&gt;()
+        MedicationDetailsScreen(id = route.id)
+    }
+}
+</code></pre>
+<h3>Аргументы</h3>
+<ul>
+<li>Поддерживаются примитивы, <code>String</code>, nullable и значения по умолчанию.</li>
+<li>Значение по умолчанию делает аргумент необязательным: <code>data class Search(val query: String = &quot;&quot;)</code>.</li>
+<li><code>enum</code> работает как аргумент, если он <code>@Serializable</code>; для своих типов нужен кастомный <code>NavType</code>.</li>
+<li><strong>Не передавай объекты и entity.</strong> Только id — иначе в маршруте окажется копия состояния.</li>
+</ul>
+<h3>Где читать аргументы</h3>
+<ul>
+<li>В Composable: <code>entry.toRoute&lt;MedicationDetails&gt;()</code>.</li>
+<li>В ViewModel: <code>SavedStateHandle.toRoute&lt;MedicationDetails&gt;()</code> — тогда экран не разбирает аргументы вручную, а ViewModel сама подгружает данные по id.</li>
+</ul>
+<h3>Как вернуть результат назад</h3>
+<p>Объекты через маршрут не возвращают. Классический приём: экран-источник кладёт результат в <code>previousBackStackEntry.savedStateHandle</code>, а экран-приёмник подписывается на <code>currentBackStackEntry.savedStateHandle.getStateFlow(...)</code>. Альтернатива для смежных экранов — общий навигационный граф с одним ViewModel, но это реже бывает оправдано.</p>
+<h3>Навигация «после действия» и UDF</h3>
+<ul>
+<li><strong>Простые переходы</strong> (клик по элементу) — колбэк <code>onClick: () -&gt; Unit</code>, переданный в Composable. Минимум связей, легко тестировать.</li>
+<li><strong>Навигация как следствие действия</strong> (форма отправлена, пользователь вышел из аккаунта) — ViewModel отдаёт одноразовое событие через <code>Channel&lt;NavEvent&gt;</code>, а экран собирает его в <code>LaunchedEffect</code> и вызывает <code>navController</code>.</li>
+<li><code>Channel</code> предпочтительнее флага в <code>UiState</code>: событие не «переигрывается» при повороте экрана.</li>
+</ul>
+<h3>Вложенные графы</h3>
+<p>Поток лучше делить по смыслу, а не условиями в каждом экране:</p>
+<pre><code class="language-kotlin">navigation&lt;AuthGraph&gt;(startDestination = Login) {
+    composable&lt;Login&gt; { … }
+    composable&lt;Register&gt; { … }
+}
+</code></pre>
+<p>Тогда «вход или основное приложение» — это выбор графа, а не <code>if (isLoggedIn)</code> в <code>NavHost</code> и внутри экранов.</p>
+<h3>Back stack: где чаще всего ломается</h3>
+<ul>
+<li><code>launchSingleTop = true</code> — не плодить дубликат текущего экрана.</li>
+<li><code>popUpTo&lt;Home&gt; { saveState = true }</code> + <code>restoreState = true</code> — сохранять состояние вкладок нижней навигации.</li>
+<li><code>popUpTo(0) { inclusive = true }</code> после выхода из аккаунта — чтобы системная кнопка «назад» не вернула в логин.</li>
+</ul>
+<h3>Deep links</h3>
+<p>Типизированный маршрут умеет быть и ссылкой: <code>composable&lt;MedicationDetails&gt;(deepLinks = listOf(navDeepLink&lt;MedicationDetails&gt;(basePath = &quot;dayly://medications&quot;)))</code>. FCM-сообщение тогда открывает нужный экран тем же маршрутом, что и обычный переход.</p>
+<h3>Мультимодульность и граф</h3>
+<ul>
+<li><strong><code>NavHost</code> живёт в <code>:app</code></strong> — только этот модуль видит все фичи.</li>
+<li>Фича отдаёт расширение графа, а не маршруты соседей: <code>fun NavGraphBuilder.medicationsScreen(onOpen: (String) -&gt; Unit)</code>.</li>
+<li><code>:app</code> связывает лямбды: открыть детали — это <code>navigate(MedicationDetails(id))</code>.</li>
+<li>Если тип-маршрут нужен нескольким фичам, вынеси его в небольшой <code>:core:navigation</code>. Не создавай этот модуль заранее — он появляется, когда маршруты реально стали общими.</li>
+</ul>
+<h3>Тестирование навигации</h3>
+<p><code>TestNavHostController</code> + <code>createComposeRule()</code>: проверяешь, что после клика текущий маршрут — ожидаемый (<code>navController.currentBackStackEntry?.toRoute&lt;MedicationDetails&gt;()</code>), а аргумент совпадает. Это самые ценные UI-тесты: они ловят именно те баги, которые дороже всего искать руками.</p>
+<h3>Частые ошибки</h3>
+<ul>
+<li>Передать в маршрут весь объект вместо id.</li>
+<li>Вызывать <code>navigate</code> прямо в теле Composable — получишь переход на каждом пересоздании; для этого есть <code>LaunchedEffect</code> и колбэки.</li>
+<li>Забыть <code>popUpTo</code> при выходе/логине — «назад» уводит туда, где пользователь уже не должен быть.</li>
+<li>Смешать навигацию и бизнес-состояние: экран не должен сам решать, куда идти после успешной операции.</li>
+</ul>
+
+</main>
+</div>
+<button id="expand" title="Показать содержание" aria-label="Показать содержание">☰</button>
+<script>
+  var layout = document.body;
+  var nav = document.getElementById('toc');
+  var navList = nav.querySelector('.toc-list');
+
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  // collapse / expand
+  document.getElementById('collapse').addEventListener('click', function () {
+    layout.classList.add('nav-collapsed');
+    store('dayly.nav', 'collapsed');
+  });
+  document.getElementById('expand').addEventListener('click', function () {
+    layout.classList.remove('nav-collapsed');
+    store('dayly.nav', 'open');
+  });
+
+  // resize by dragging the right edge
+  var grip = document.getElementById('grip');
+  var dragging = false;
+  grip.addEventListener('mousedown', function (e) {
+    dragging = true; e.preventDefault(); document.body.style.userSelect = 'none';
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    var w = Math.min(560, Math.max(180, e.clientX));
+    nav.style.width = w + 'px';
+    store('dayly.navw', String(w));
+  });
+  window.addEventListener('mouseup', function () {
+    if (!dragging) return;
+    dragging = false; document.body.style.userSelect = '';
+  });
+
+  // restore saved state
+  var savedW = read('dayly.navw');
+  if (savedW) { nav.style.width = savedW + 'px'; }
+  if (read('dayly.nav') === 'collapsed') { layout.classList.add('nav-collapsed'); }
+
+  // in-document scrolling without leaving the page
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var id = decodeURIComponent(a.getAttribute('href').slice(1));
+    var el = document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (history.replaceState) history.replaceState(null, '', '#' + id);
+  });
+
+  // highlight the section currently in view
+  var links = Array.prototype.slice.call(navList.querySelectorAll('a[href^="#"]'));
+  var byId = {};
+  links.forEach(function (a) { byId[decodeURIComponent(a.getAttribute('href').slice(1))] = a; });
+  var targets = Object.keys(byId)
+    .map(function (id) { return document.getElementById(id); })
+    .filter(Boolean)
+    .sort(function (a, b) { return a.offsetTop - b.offsetTop; });
+
+  function syncActive() {
+    var pos = window.scrollY + 90;
+    var current = null;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i].offsetTop <= pos) current = targets[i]; else break;
+    }
+    links.forEach(function (a) { a.classList.remove('active'); });
+    if (current && byId[current.id]) {
+      var a = byId[current.id];
+      a.classList.add('active');
+      var top = a.offsetTop - navList.clientHeight / 2;
+      if (Math.abs(navList.scrollTop - top) > navList.clientHeight / 2) {
+        navList.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+    }
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { syncActive(); ticking = false; });
+  }, { passive: true });
+  syncActive();
+</script>
+</body>
+</html>
