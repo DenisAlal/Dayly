@@ -1109,25 +1109,44 @@ dependencies {
 │
 ├── domain/
 │   └── api/
-│       └── src/main/kotlin/com/denalal/dayly/domain/
-│           ├── medication/
-│           │   ├── Medication.kt
-│           │   ├── MedicationSchedule.kt
-│           │   ├── MedicationRepository.kt
-│           │   └── usecase/
-│           │       ├── ObserveMedicationsUseCase.kt
-│           │       ├── AddMedicationUseCase.kt
-│           │       └── MarkMedicationTakenUseCase.kt
-│           ├── auth/
-│           │   ├── User.kt
-│           │   └── AuthRepository.kt
-│           └── wellness/
-│               ├── HealthIndex.kt
-│               ├── HealthFactor.kt
-│               ├── WeatherSnapshot.kt
-│               ├── AirQualitySnapshot.kt
-│               ├── HealthIndexCalculator.kt
-│               └── WellnessRepository.kt
+│       ├── src/main/java/com/denalal/dayly/domain/
+│       │   ├── medication/
+│       │   │   ├── model/
+│       │   │   │   ├── Medication.kt
+│       │   │   │   ├── Dose.kt              # Dose + DoseUnit
+│       │   │   │   ├── MedicationSchedule.kt
+│       │   │   │   ├── MedicationTime.kt
+│       │   │   │   ├── Weekday.kt
+│       │   │   │   └── MedicationListExtensions.kt
+│       │   │   ├── repository/
+│       │   │   │   └── MedicationRepository.kt
+│       │   │   └── usecase/                 # появится на неделе 2
+│       │   ├── auth/
+│       │   │   ├── model/
+│       │   │   │   └── User.kt
+│       │   │   └── repository/
+│       │   │       └── AuthRepository.kt
+│       │   └── wellness/
+│       │       ├── model/
+│       │       │   ├── HealthIndex.kt
+│       │       │   ├── HealthFactor.kt
+│       │       │   ├── WeatherSnapshot.kt
+│       │       │   └── AirQualitySnapshot.kt
+│       │       ├── repository/
+│       │       │   └── WellnessRepository.kt
+│       │       └── usecase/
+│       │           └── CalculateHealthIndex.kt
+│       └── src/test/java/com/denalal/dayly/domain/
+│           └── medication/
+│               ├── model/
+│               │   ├── DoseTest.kt
+│               │   ├── MedicationScheduleTest.kt
+│               │   ├── MedicationTimeTest.kt
+│               │   ├── MedicationListExtensionsTest.kt
+│               │   └── MedicationExtensionsTest.kt
+│               └── repository/
+│                   ├── FakeMedicationRepository.kt
+│                   └── MedicationRepositoryTest.kt
 │
 ├── data/
 │   └── impl/
@@ -1192,15 +1211,15 @@ dependencies {
 </tr>
 </thead>
 <tbody><tr>
-<td><code>domain/.../medication/Medication.kt</code></td>
-<td>доменная модель: <code>id</code>, <code>name</code>, <code>dose</code>, <code>times</code></td>
+<td><code>domain/.../medication/model/Medication.kt</code></td>
+<td>доменная модель: <code>id</code>, <code>name</code>, <code>dose</code>, <code>schedule</code></td>
 </tr>
 <tr>
-<td><code>domain/.../medication/MedicationRepository.kt</code></td>
+<td><code>domain/.../medication/repository/MedicationRepository.kt</code></td>
 <td>контракт: <code>observeAll</code>, <code>add</code>, <code>markAsTaken</code></td>
 </tr>
 <tr>
-<td><code>domain/.../usecase/*</code></td>
+<td><code>domain/.../medication/usecase/*</code></td>
 <td>сценарии: один файл — одно действие</td>
 </tr>
 <tr>
@@ -1247,11 +1266,12 @@ dependencies {
 <p><strong>Правила именования и размещения</strong></p>
 <ul>
 <li><code>*Screen</code> — Composable-экран, <code>*ViewModel</code> — состояние и логика, <code>*UiState</code> — <code>sealed interface</code> состояния.</li>
+<li>Внутри фичи домена — три пакета по роли: <code>model/</code> (данные и правила), <code>repository/</code> (контракт), <code>usecase/</code> (сценарии). Пакет появляется, когда в нём есть что держать, а не заранее.</li>
 <li><code>*Entity</code> / <code>*Dao</code> — только в <code>:core:database</code>; <code>*Dto</code> — только в <code>:core:network</code>; <code>*Document</code> — только в <code>:data:impl</code> (Firestore-документ).</li>
 <li><code>*Repository</code> (интерфейс) — в <code>:domain:api</code>, <code>*RepositoryImpl</code> — в <code>:data:impl</code>; <code>*UseCase</code> — в <code>:domain:api</code>.</li>
 <li><code>*Source</code> — тонкая обёртка над внешним API (Firestore, Auth), живёт в <code>:data:impl</code>.</li>
 <li>Тесты повторяют пакеты: <code>src/test/java/com/denalal/dayly/...</code>, UI-тесты — <code>src/androidTest/...</code>.</li>
-<li>Android-модули держи <code>src/main/java</code>, чистый Kotlin-модуль — <code>src/main/kotlin</code>. На компиляцию это не влияет, но так принято в Android Studio.</li>
+<li>Модули у нас используют <code>src/main/java</code>; <code>src/main/kotlin</code> тоже работает. Важно не имя папки, а совпадение <code>package</code> с путём.</li>
 </ul>
 <blockquote>
 <p>💡 <strong>Куда положить новый файл?</strong> Если это модель или контракт — <code>:domain:api</code>. Если работа с базой, сетью или Firebase — <code>:data:impl</code> (или соответствующий <code>:core:*</code>, если это инфраструктура). Если это экран или ViewModel — в <code>:feature:&lt;name&gt;</code>. Если переиспользуемая кнопка или цвет — <code>:core:ui</code>.</p>

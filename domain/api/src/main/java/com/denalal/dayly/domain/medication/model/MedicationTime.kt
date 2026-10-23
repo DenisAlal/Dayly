@@ -1,4 +1,4 @@
-package com.denalal.dayly.domain.medication
+package com.denalal.dayly.domain.medication.model
 
 data class MedicationTime(val hour: Int, val minute: Int) {
     init {
@@ -6,3 +6,5 @@ data class MedicationTime(val hour: Int, val minute: Int) {
         require(minute in 0..59) { "minute должен быть 0..59, был: $minute" }
     }
 }
+
+fun MedicationTime.format(): String = "%02d:%02d".format(hour, minute)

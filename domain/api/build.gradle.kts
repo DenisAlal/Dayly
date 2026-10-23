@@ -16,6 +16,17 @@ kotlin {
 }
 
 dependencies {
-    // Модели пока без зависимостей. Когда в контракте появится Flow, сюда добавится:
-    // api("org.jetbrains.kotlinx:kotlinx-coroutines-core:...")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation(kotlin("test"))
+}
+
+tasks.test {
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = true
+        showStackTraces = true
+    }
 }

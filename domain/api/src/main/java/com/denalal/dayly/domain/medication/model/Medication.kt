@@ -1,4 +1,4 @@
-package com.denalal.dayly.domain.medication
+package com.denalal.dayly.domain.medication.model
 
 data class Medication(
     val id: String,
