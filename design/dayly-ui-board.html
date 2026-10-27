@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Dayly — UI handoff</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 10% 0%, #F2EEE7 0%, transparent 60%),
+      radial-gradient(1000px 500px at 95% 100%, #DFE9E1 0%, transparent 55%),
+      #E7E2D9;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:#1C2B24;padding:44px 60px 64px;
+  }
+  .board{max-width:1560px;margin:0 auto;display:flex;flex-direction:column;gap:34px;}
+
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:6px;}
+  .head h1{font-size:30px;letter-spacing:-.025em;font-weight:750;}
+  .head p{color:#6E7C74;font-size:13.5px;margin-top:6px;max-width:820px;line-height:1.5;}
+  .head .meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .tag{font-size:11.5px;font-weight:650;color:#3C6350;background:#E3EFE7;border:1px solid #CFE1D6;padding:7px 12px;border-radius:999px;white-space:nowrap;}
+
+  .sec{display:flex;flex-direction:column;gap:16px;}
+  .sec-head{display:flex;align-items:center;gap:12px;}
+  .sec-head .num{font-size:11px;font-weight:800;color:#4F7C63;letter-spacing:.14em;}
+  .sec-head h2{font-size:15px;letter-spacing:-.01em;font-weight:700;}
+  .sec-head .line{flex:1;height:1px;background:rgba(60,99,80,.18);}
+  .sec-head .note{font-size:11.5px;color:#7C8880;font-weight:600;}
+
+  .frames{display:flex;gap:18px;align-items:flex-start;}
+  .slot{width:281px;flex:0 0 auto;display:flex;flex-direction:column;gap:9px;}
+  .slot .label{font-size:11.5px;font-weight:700;color:#46564C;letter-spacing:.01em;display:flex;align-items:center;gap:6px;}
+  .slot .label i{width:6px;height:6px;border-radius:50%;background:#A9C7B7;display:inline-block;}
+  .slot .box{width:281px;height:608px;position:relative;}
+  .slot .box .phone{position:absolute;top:0;left:0;transform:scale(.72);transform-origin:top left;}
+
+  /* ===== phone & tokens ===== */
+  .phone{width:390px;height:844px;border-radius:46px;position:relative;overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 24px 48px rgba(30,40,34,.22), 0 3px 10px rgba(30,40,34,.10);}
+  .phone.light{
+    --app:#F7F4EE; --card:#FFFFFF; --ink:#1C2B24; --muted:#6E7C74; --line:#E7E1D7;
+    --sage:#4F7C63; --sage-dark:#3C6350; --sage-soft:#E3EFE7; --sage-ghost:#F0F6F2;
+    --nav:#FFFFFF; --seg-bg:#EFECE4; --seg-on:#FFFFFF;
+    --health1:#4F7C63; --health2:#3C6350; --health-ink:#F4FBF6; --ring-rest:rgba(255,255,255,.18);
+    --check:#CBD8D0; --track:#EEF2EE; --shadow:rgba(40,52,45,.10);
+    background:var(--app);color:var(--ink);
+  }
+  .phone.dark{
+    --app:#0F1512; --card:#18201B; --ink:#E9F0EA; --muted:#93A399; --line:#29332C;
+    --sage:#8FC3A6; --sage-dark:#A9D4BB; --sage-soft:#223029; --sage-ghost:#1F2A23;
+    --nav:#151C17; --seg-bg:#1E2821; --seg-on:#2B3A31;
+    --health1:#2F4F3F; --health2:#213A2C; --health-ink:#EAF5EE; --ring-rest:rgba(255,255,255,.12);
+    --check:#3A4A40; --track:#243028; --shadow:rgba(0,0,0,.35);
+    background:var(--app);color:var(--ink);
+  }
+  .notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#122018;border-radius:999px;z-index:5;}
+  .phone.light .notch{background:#152019;}
+  .status{height:52px;display:flex;align-items:center;justify-content:space-between;padding:18px 26px 0;font-size:13px;font-weight:600;color:var(--ink);}
+  .status .icons{display:flex;gap:6px;align-items:center;opacity:.8;}
+  .screen{padding:10px 22px 0;flex:1;overflow:hidden;}
+  .screen.with-actions{padding-bottom:92px;}
+
+  .hello{margin-top:14px;}
+  .hello .hi{font-size:12px;color:var(--muted);letter-spacing:.08em;font-weight:600;}
+  .hello h2{font-size:27px;line-height:1.15;letter-spacing:-.02em;margin-top:5px;font-weight:700;}
+  .hello .sub{font-size:13px;color:var(--muted);margin-top:6px;}
+
+  .health{margin-top:18px;background:linear-gradient(150deg,var(--health1) 0%,var(--health2) 100%);
+    border-radius:26px;padding:20px;color:var(--health-ink);position:relative;overflow:hidden;box-shadow:0 14px 26px rgba(30,50,38,.24);}
+  .health:after{content:"";position:absolute;right:-40px;top:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.16),transparent 65%);}
+  .health-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .health-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.78;font-weight:700;}
+  .ring{width:104px;height:104px;border-radius:50%;position:relative;display:grid;place-items:center;
+    background:conic-gradient(#CFE7D8 0deg 281deg, var(--ring-rest) 281deg 360deg);flex:0 0 auto;}
+  .phone.dark .ring{background:conic-gradient(#8FC3A6 0deg 281deg, var(--ring-rest) 281deg 360deg);}
+  .ring:before{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--health2);}
+  .ring .score{position:relative;text-align:center;}
+  .ring .score b{font-size:30px;line-height:1;letter-spacing:-.03em;}
+  .ring .score span{display:block;font-size:9.5px;opacity:.72;margin-top:3px;letter-spacing:.1em;}
+  .health-body{display:flex;gap:16px;align-items:center;margin-top:14px;}
+  .health-text h3{font-size:17px;font-weight:650;letter-spacing:-.01em;}
+  .health-text p{font-size:12.5px;opacity:.82;margin-top:5px;line-height:1.45;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .chip{font-size:11px;font-weight:600;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.14);color:var(--health-ink);border:1px solid rgba(255,255,255,.14);}
+  .chip.warm{background:rgba(227,154,110,.24);border-color:rgba(227,154,110,.34);color:#FFE7D6;}
+  .pchip{font-size:11px;font-weight:600;padding:6px 10px;border-radius:999px;background:var(--sage-soft);color:var(--sage-dark);border:1px solid var(--line);}
+
+  .weather{display:flex;gap:8px;margin-top:12px;}
+  .wx{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;display:flex;align-items:center;gap:9px;}
+  .wx .ic{width:28px;height:28px;border-radius:9px;background:var(--sage-soft);display:grid;place-items:center;font-size:14px;}
+  .wx .v{font-size:13.5px;font-weight:650;line-height:1.1;}
+  .wx .k{font-size:10px;color:var(--muted);margin-top:2px;}
+
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin:20px 2px 10px;}
+  .section-head h4{font-size:15px;font-weight:650;letter-spacing:-.01em;}
+  .section-head a{font-size:12.5px;color:var(--sage);font-weight:600;text-decoration:none;}
+
+  .med{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+  .med .pill{width:38px;height:38px;border-radius:12px;background:var(--sage-soft);display:grid;place-items:center;flex:0 0 auto;font-size:16px;}
+  .med .info{flex:1;min-width:0;}
+  .med .info b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em;}
+  .med .info small{color:var(--muted);font-size:11px;}
+  .med .time{font-size:11.5px;font-weight:650;color:var(--sage-dark);background:var(--sage-ghost);padding:5px 9px;border-radius:999px;}
+  .check{width:26px;height:26px;border-radius:50%;border:1.6px solid var(--check);flex:0 0 auto;display:grid;place-items:center;color:transparent;font-size:12px;}
+  .check.done{background:var(--sage);border-color:var(--sage);color:#0F1512;}
+
+  .nav{margin:auto 14px 14px;background:var(--nav);border:1px solid var(--line);border-radius:24px;padding:10px 14px;display:flex;justify-content:space-between;box-shadow:0 10px 24px var(--shadow);}
+  .nav a{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--muted);font-size:9px;font-weight:600;opacity:.72;}
+  .nav a.on{color:var(--sage);opacity:1;}
+  .nav .dot{width:22px;height:22px;display:grid;place-items:center;font-size:13px;}
+
+  /* meds */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+  .topbar h2{font-size:27px;letter-spacing:-.02em;font-weight:700;}
+  .round-btn{width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;color:var(--sage-dark);font-size:18px;}
+  .search{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;}
+  .filters{display:flex;gap:8px;margin-top:14px;}
+  .filter{padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--muted);}
+  .filter.on{background:var(--ink);border-color:var(--ink);color:var(--app);}
+  .group-label{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:22px 2px 10px;}
+  .card-big{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:10px;}
+  .card-big .head{display:flex;align-items:flex-start;gap:12px;}
+  .card-big .head .pill{width:42px;height:42px;border-radius:13px;background:var(--sage-soft);display:grid;place-items:center;font-size:17px;}
+  .card-big .head b{font-size:15.5px;display:block;letter-spacing:-.01em;}
+  .card-big .head small{color:var(--muted);font-size:12px;}
+  .card-big .head .more{margin-left:auto;color:var(--muted);font-weight:700;letter-spacing:.1em;}
+  .times{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+  .tpill{font-size:11.5px;font-weight:650;color:var(--sage-dark);background:var(--sage-ghost);border:1px solid var(--line);padding:5px 9px;border-radius:999px;}
+  .progress{height:5px;border-radius:999px;background:var(--track);margin-top:12px;overflow:hidden;}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,#7FAE95,#4F7C63);border-radius:999px;}
+  .phone.dark .progress i{background:linear-gradient(90deg,#4E7F66,#8FC3A6);}
+  .fab{position:absolute;right:22px;bottom:26px;width:56px;height:56px;border-radius:20px;background:var(--sage);color:#0F1512;display:grid;place-items:center;font-size:24px;box-shadow:0 14px 24px rgba(79,124,99,.34);}
+
+  /* habits */
+  .date-strip{display:flex;justify-content:space-between;margin-top:16px;}
+  .date-strip .d{width:40px;height:54px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9.5px;color:var(--muted);font-weight:600;}
+  .date-strip .d b{font-size:13px;color:var(--ink);font-weight:700;}
+  .date-strip .d.on{background:var(--sage);border-color:var(--sage);}
+  .date-strip .d.on b,.date-strip .d.on span{color:#0F1512;}
+  .summary{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+  .summary .big{font-size:22px;font-weight:750;letter-spacing:-.02em;}
+  .summary .k{font-size:11px;color:var(--muted);margin-top:2px;}
+  .summary .mini{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--sage-dark);
+    background:conic-gradient(var(--sage) 0deg 216deg, var(--track) 216deg 360deg);position:relative;}
+  .summary .mini:before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card);}
+  .summary .mini span{position:relative;}
+  .habit{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;}
+  .habit .ico{width:38px;height:38px;border-radius:12px;background:var(--sage-soft);display:grid;place-items:center;font-size:16px;flex:0 0 auto;}
+  .habit .info{flex:1;min-width:0;}
+  .habit .info b{display:block;font-size:13.5px;font-weight:650;}
+  .habit .info small{color:var(--muted);font-size:11px;}
+  .habit .streak{font-size:10.5px;font-weight:700;color:var(--sage-dark);background:var(--sage-ghost);padding:4px 8px;border-radius:999px;}
+  .habit .bar{height:4px;border-radius:999px;background:var(--track);margin-top:8px;overflow:hidden;}
+  .habit .bar i{display:block;height:100%;background:var(--sage);border-radius:999px;}
+
+  /* add */
+  .nav-inline{display:flex;align-items:center;gap:12px;margin-top:14px;}
+  .nav-inline .back{width:38px;height:38px;border-radius:13px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;color:var(--ink);font-size:18px;}
+  .nav-inline h2{font-size:21px;letter-spacing:-.02em;font-weight:700;}
+  .field{margin-top:14px;}
+  .field label{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .input{margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px;font-size:14px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;}
+  .input .hint{color:var(--muted);font-size:12.5px;}
+  .seg{display:flex;gap:5px;background:var(--seg-bg);padding:4px;border-radius:13px;margin-top:7px;}
+  .seg span{flex:1;text-align:center;padding:8px 0;border-radius:10px;font-size:12px;font-weight:650;color:var(--muted);}
+  .seg span.on{background:var(--seg-on);color:var(--ink);box-shadow:0 2px 6px var(--shadow);}
+  .time-row{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap;}
+  .time-slot{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:8px 11px;font-size:12.5px;font-weight:650;color:var(--ink);}
+  .time-slot.add{color:var(--sage-dark);border-style:dashed;background:var(--sage-ghost);}
+  .time-slot small{color:var(--muted);font-weight:500;}
+  .days{display:flex;justify-content:space-between;margin-top:7px;}
+  .day{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:650;color:var(--muted);border:1px solid var(--line);background:var(--card);}
+  .day.on{background:var(--sage);border-color:var(--sage);color:#0F1512;}
+  .note{margin-top:6px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px;font-size:12.5px;color:var(--muted);min-height:60px;}
+  .actions{position:absolute;left:22px;right:22px;bottom:22px;display:flex;gap:10px;z-index:4;}
+  .btn{flex:1;height:54px;border-radius:18px;border:0;font:inherit;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn.primary{background:linear-gradient(160deg,#5B8A6F,#40694F);color:#fff;box-shadow:0 14px 26px rgba(64,105,79,.28);}
+  .phone.dark .btn.primary{background:linear-gradient(160deg,#8FC3A6,#5E9C7C);color:#0F1512;box-shadow:0 14px 26px rgba(0,0,0,.35);}
+  .btn.ghost{flex:0 0 54px;background:var(--card);border:1px solid var(--line);color:var(--ink);}
+
+  /* sleep */
+  .sleep-hero{margin-top:16px;background:linear-gradient(150deg,var(--sage-soft),var(--card));border:1px solid var(--line);border-radius:24px;padding:18px;position:relative;overflow:hidden;}
+  .sleep-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .sleep-big{display:flex;align-items:baseline;gap:6px;margin-top:12px;}
+  .sleep-big b{font-size:38px;line-height:1;letter-spacing:-.03em;}
+  .sleep-big span{font-size:13px;color:var(--muted);font-weight:600;}
+  .sleep-big .sep{width:1px;height:24px;background:var(--line);margin:0 5px;}
+  .sleep-track{display:flex;height:12px;border-radius:999px;overflow:hidden;margin-top:16px;background:var(--track);}
+  .sleep-track i{display:block;height:100%;}
+  .sleep-track .deep{background:#3C6350;width:24%;}
+  .sleep-track .light{background:#7FAE95;width:58%;}
+  .sleep-track .wake{background:#D8C6A8;width:18%;}
+  .phone.dark .sleep-track .deep{background:#8FC3A6;}
+  .phone.dark .sleep-track .light{background:#4E7F66;}
+  .phone.dark .sleep-track .wake{background:#6E6350;}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .legend i{width:7px;height:7px;border-radius:2px;display:inline-block;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;}
+  .row-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);}
+  .row-item:last-child{border-bottom:0;}
+  .row-item .ico{width:34px;height:34px;border-radius:11px;background:var(--sage-soft);display:grid;place-items:center;font-size:15px;flex:0 0 auto;}
+  .row-item .txt{flex:1;min-width:0;}
+  .row-item .txt b{display:block;font-size:13.5px;font-weight:650;}
+  .row-item .txt small{color:var(--muted);font-size:11px;}
+  .row-item .val{font-size:12.5px;color:var(--sage-dark);font-weight:700;}
+  .switch{width:42px;height:25px;border-radius:999px;background:var(--seg-bg);border:1px solid var(--line);position:relative;flex:0 0 auto;}
+  .switch i{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+  .switch.on{background:var(--sage);border-color:var(--sage);}
+  .switch.on i{left:auto;right:2px;background:#0F1512;}
+  .tip{display:flex;gap:10px;align-items:flex-start;background:var(--sage-ghost);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:14px;font-size:11.5px;color:var(--muted);line-height:1.45;}
+  .tip b{color:var(--ink);font-weight:650;}
+
+  /* settings */
+  .profile{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;margin-top:16px;}
+  .avatar{width:46px;height:46px;border-radius:16px;background:linear-gradient(150deg,#5B8A6F,#3C6350);color:#EAF5EE;display:grid;place-items:center;font-weight:750;font-size:16px;}
+  .profile .txt{flex:1;min-width:0;}
+  .profile .txt b{display:block;font-size:14.5px;font-weight:700;}
+  .profile .txt small{color:var(--muted);font-size:11.5px;}
+  .seg-theme{display:flex;gap:5px;background:var(--seg-bg);padding:5px;border-radius:16px;border:1px solid var(--line);margin-top:8px;}
+  .seg-theme .opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:12px;font-size:11px;font-weight:650;color:var(--muted);}
+  .seg-theme .opt .ic{font-size:15px;line-height:1;}
+  .seg-theme .opt.on{background:var(--seg-on);color:var(--ink);box-shadow:0 2px 8px var(--shadow);}
+  .hint{font-size:11px;color:var(--muted);margin:8px 4px 0;line-height:1.45;}
+
+  /* auth */
+  .auth{display:flex;flex-direction:column;height:100%;padding:34px 4px 0;}
+  .logo{width:64px;height:64px;border-radius:20px;background:linear-gradient(160deg,#5B8A6F,#3C6350);display:grid;place-items:center;font-size:28px;box-shadow:0 16px 28px rgba(60,99,80,.28);}
+  .auth h1{font-size:27px;letter-spacing:-.025em;margin-top:20px;font-weight:750;}
+  .auth p{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.5;}
+  .auth .input{margin-top:9px;}
+  .auth .btn.primary{margin-top:18px;width:100%;flex:none;}
+  .divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:11px;}
+  .divider:before,.divider:after{content:"";flex:1;height:1px;background:var(--line);}
+  .btn-google{height:52px;border-radius:17px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;font-weight:650;color:var(--ink);}
+  .auth .foot{margin-top:auto;text-align:center;font-size:12px;color:var(--muted);padding-bottom:26px;}
+  .auth .foot b{color:var(--sage-dark);}
+
+  /* tokens */
+  .tokens{display:flex;gap:12px;flex-wrap:wrap;}
+  .tok{background:#FBF9F4;border:1px solid #DCD6CA;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;min-width:186px;}
+  .tok .sw{width:30px;height:30px;border-radius:10px;border:1px solid rgba(0,0,0,.06);}
+  .tok .tx b{display:block;font-size:11.5px;font-weight:700;color:#1C2B24;}
+  .tok .tx small{font-size:10.5px;color:#7C8880;}
+  .type{background:#FBF9F4;border:1px solid #DCD6CA;border-radius:16px;padding:12px 16px;flex:1;min-width:260px;}
+  .type .t1{font-size:22px;font-weight:750;letter-spacing:-.02em;color:#1C2B24;}
+  .type .t2{font-size:13px;color:#5C6B62;margin-top:4px;}
+  .type .t3{font-size:11px;color:#7C8880;margin-top:6px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;}
+
+  .foot-note{color:#7C8880;font-size:12px;line-height:1.55;max-width:1100px;}
+  .foot-note b{color:#3C6350;}
+</style>
+</head>
+<body>
+<div class="board">
+
+  <div class="head">
+    <div>
+      <h1>Dayly · UI handoff</h1>
+      <p>Все экраны приложения в двух темах. Пять табов: Главная, Лекарства, Привычки, Сон, Ещё. Плюс флоу добавления лекарства и вход.</p>
+    </div>
+    <div class="meta">
+      <span class="tag">Material 3</span>
+      <span class="tag">Light / Dark</span>
+      <span class="tag">8pt grid</span>
+    </div>
+  </div>
+
+  <!-- LIGHT ROW -->
+  <div class="sec">
+    <div class="sec-head"><span class="num">01</span><h2>Главные экраны · Light</h2><span class="line"></span><span class="note">5 табов</span></div>
+    <div class="frames" id="lightRow">
+
+      <!-- HOME -->
+      <div class="slot">
+        <div class="label"><i></i>Главная</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="hello">
+                <div class="hi">ВТОРНИК, 27 ОКТЯБРЯ</div>
+                <h2>Доброе утро,<br>Алия</h2>
+                <div class="sub">Сегодня 3 приёма и 2 привычки</div>
+              </div>
+              <div class="health">
+                <div class="health-top"><span class="health-label">Самочувствие</span><span class="chip">8 мин назад</span></div>
+                <div class="health-body">
+                  <div class="ring"><div class="score"><b>78</b><span>ИЗ 100</span></div></div>
+                  <div class="health-text">
+                    <h3>Умеренный день</h3>
+                    <p>Давление падает, воздух сухой.<br>Пей больше воды и проветри спальню.</p>
+                    <div class="chips"><span class="chip warm">Давление ↓</span><span class="chip">Сухость 34%</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="weather">
+                <div class="wx"><div class="ic">☀</div><div><div class="v">+14°</div><div class="k">ощущается 12°</div></div></div>
+                <div class="wx"><div class="ic">💧</div><div><div class="v">62%</div><div class="k">влажность</div></div></div>
+                <div class="wx"><div class="ic">🍃</div><div><div class="v">12</div><div class="k">PM2.5</div></div></div>
+              </div>
+              <div class="section-head"><h4>Сегодня</h4><a href="#">Все приёмы</a></div>
+              <div class="med"><div class="pill">💊</div><div class="info"><b>Витамин D</b><small>1 таб. · после завтрака</small></div><span class="time">09:00</span><div class="check done">✓</div></div>
+              <div class="med"><div class="pill">💊</div><div class="info"><b>Омега-3</b><small>2 кап. · с едой</small></div><span class="time">13:00</span><div class="check"></div></div>
+              <div class="med"><div class="pill">💊</div><div class="info"><b>Магний B6</b><small>1 таб. · перед сном</small></div><span class="time">21:00</span><div class="check"></div></div>
+            </div>
+            <div class="nav">
+              <a class="on" href="#"><span class="dot">⌂</span>Главная</a>
+              <a href="#"><span class="dot">◫</span>Лекарства</a>
+              <a href="#"><span class="dot">◎</span>Привычки</a>
+              <a href="#"><span class="dot">☾</span>Сон</a>
+              <a href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDS -->
+      <div class="slot">
+        <div class="label"><i></i>Лекарства</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="topbar"><h2>Лекарства</h2><div class="round-btn">＋</div></div>
+              <div class="search"><span>⌕</span> Поиск по названию</div>
+              <div class="filters"><span class="filter on">Все</span><span class="filter">Утро</span><span class="filter">День</span><span class="filter">Вечер</span></div>
+              <div class="group-label">Активные · 3</div>
+              <div class="card-big">
+                <div class="head"><div class="pill">💊</div><div><b>Витамин D</b><small>1 таблетка · курс 30 дней</small></div><div class="more">⋯</div></div>
+                <div class="times"><span class="tpill">09:00</span><span class="tpill">Пн–Пт</span></div>
+                <div class="progress"><i style="width:64%"></i></div>
+              </div>
+              <div class="card-big">
+                <div class="head"><div class="pill">💊</div><div><b>Омега-3</b><small>2 капсулы · ежедневно</small></div><div class="more">⋯</div></div>
+                <div class="times"><span class="tpill">13:00</span><span class="tpill">Каждый день</span></div>
+                <div class="progress"><i style="width:41%"></i></div>
+              </div>
+              <div class="card-big">
+                <div class="head"><div class="pill">💊</div><div><b>Магний B6</b><small>1 таблетка · перед сном</small></div><div class="more">⋯</div></div>
+                <div class="times"><span class="tpill">21:00</span><span class="tpill">Пн, Ср, Пт</span></div>
+                <div class="progress"><i style="width:82%"></i></div>
+              </div>
+              <div class="group-label">Завершённые</div>
+              <div class="card-big" style="opacity:.62">
+                <div class="head"><div class="pill" style="background:var(--sage-ghost)">💊</div><div><b>Антибиотик</b><small>курс завершён 12 октября</small></div><div class="more">⋯</div></div>
+                <div class="times"><span class="tpill">10:00 · 22:00</span></div>
+              </div>
+            </div>
+            <div class="fab">＋</div>
+            <div class="nav">
+              <a href="#"><span class="dot">⌂</span>Главная</a>
+              <a class="on" href="#"><span class="dot">◫</span>Лекарства</a>
+              <a href="#"><span class="dot">◎</span>Привычки</a>
+              <a href="#"><span class="dot">☾</span>Сон</a>
+              <a href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HABITS -->
+      <div class="slot">
+        <div class="label"><i></i>Привычки</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="topbar"><h2>Привычки</h2><div class="round-btn">＋</div></div>
+              <div class="date-strip">
+                <div class="d"><span>ПН</span><b>26</b></div>
+                <div class="d on"><span>ВТ</span><b>27</b></div>
+                <div class="d"><span>СР</span><b>28</b></div>
+                <div class="d"><span>ЧТ</span><b>29</b></div>
+                <div class="d"><span>ПТ</span><b>30</b></div>
+                <div class="d"><span>СБ</span><b>31</b></div>
+                <div class="d"><span>ВС</span><b>01</b></div>
+              </div>
+              <div class="summary">
+                <div><div class="big">3 из 5</div><div class="k">выполнено сегодня · серия 12 дней</div></div>
+                <div class="mini"><span>60%</span></div>
+              </div>
+              <div class="group-label">Утро</div>
+              <div class="habit">
+                <div class="ico">💧</div>
+                <div class="info"><b>Вода</b><small>6 из 8 стаканов</small><div class="bar"><i style="width:75%"></i></div></div>
+                <span class="streak">🔥 12</span>
+                <div class="check done">✓</div>
+              </div>
+              <div class="habit">
+                <div class="ico">🤸</div>
+                <div class="info"><b>Зарядка</b><small>10 минут</small><div class="bar"><i style="width:40%"></i></div></div>
+                <span class="streak">🔥 4</span>
+                <div class="check"></div>
+              </div>
+              <div class="group-label">Вечер</div>
+              <div class="habit">
+                <div class="ico">📖</div>
+                <div class="info"><b>Чтение</b><small>20 страниц</small><div class="bar"><i style="width:100%"></i></div></div>
+                <span class="streak">🔥 8</span>
+                <div class="check done">✓</div>
+              </div>
+              <div class="habit">
+                <div class="ico">🧘</div>
+                <div class="info"><b>Медитация</b><small>5 минут</small><div class="bar"><i style="width:0%"></i></div></div>
+                <span class="streak">🔥 3</span>
+                <div class="check"></div>
+              </div>
+            </div>
+            <div class="fab">＋</div>
+            <div class="nav">
+              <a href="#"><span class="dot">⌂</span>Главная</a>
+              <a href="#"><span class="dot">◫</span>Лекарства</a>
+              <a class="on" href="#"><span class="dot">◎</span>Привычки</a>
+              <a href="#"><span class="dot">☾</span>Сон</a>
+              <a href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLEEP -->
+      <div class="slot">
+        <div class="label"><i></i>Сон</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen with-actions">
+              <div class="topbar"><h2>Сон</h2></div>
+              <div class="sleep-hero">
+                <div class="sleep-top"><span class="health-label">Прошлая ночь</span><span class="pchip">7 ч 42 мин</span></div>
+                <div class="sleep-big"><b>23:10</b><span class="sep"></span><b>06:52</b><span>отбой → подъём</span></div>
+                <div class="sleep-track"><i class="deep"></i><i class="light"></i><i class="wake"></i></div>
+                <div class="legend">
+                  <span><i style="background:#3C6350"></i>Глубокий 1ч 48м</span>
+                  <span><i style="background:#7FAE95"></i>Лёгкий 5ч 34м</span>
+                  <span><i style="background:#D8C6A8"></i>Бодрствование 20м</span>
+                </div>
+              </div>
+              <div class="group-label">Напоминания</div>
+              <div class="panel">
+                <div class="row-item"><div class="ico">🌙</div><div class="txt"><b>Напоминать об отбое</b><small>За 30 минут до сна</small></div><div class="switch on"><i></i></div></div>
+                <div class="row-item"><div class="ico">⏰</div><div class="txt"><b>Отбой</b><small>Пн–Пт</small></div><div class="val">23:00</div></div>
+                <div class="row-item"><div class="ico">☀</div><div class="txt"><b>Подъём</b><small>будильник</small></div><div class="val">07:00</div></div>
+              </div>
+              <div class="tip">🌡 <div><b>В спальне 18°, влажность 45%.</b> Хорошие условия: прохладно и не сухо.</div></div>
+            </div>
+            <div class="actions"><div class="btn primary">Сохранить расписание</div></div>
+            <div class="nav">
+              <a href="#"><span class="dot">⌂</span>Главная</a>
+              <a href="#"><span class="dot">◫</span>Лекарства</a>
+              <a href="#"><span class="dot">◎</span>Привычки</a>
+              <a class="on" href="#"><span class="dot">☾</span>Сон</a>
+              <a href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="slot">
+        <div class="label"><i></i>Ещё / Настройки</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="topbar"><h2>Ещё</h2></div>
+              <div class="profile">
+                <div class="avatar">А</div>
+                <div class="txt"><b>Алия</b><small>aliya@mail.com</small></div>
+                <div class="val" style="font-size:11px">выйти</div>
+              </div>
+              <div class="group-label">Оформление</div>
+              <div class="seg-theme">
+                <div class="opt on"><span class="ic">◐</span>Системная</div>
+                <div class="opt"><span class="ic">☀</span>Светлая</div>
+                <div class="opt"><span class="ic">☾</span>Тёмная</div>
+              </div>
+              <div class="hint">Пока тема не выбрана вручную — Dayly следует системе.</div>
+              <div class="group-label">Напоминания</div>
+              <div class="panel">
+                <div class="row-item"><div class="ico">🔔</div><div class="txt"><b>Уведомления</b><small>Лекарства и привычки</small></div><div class="switch on"><i></i></div></div>
+                <div class="row-item"><div class="ico">⏰</div><div class="txt"><b>Точные будильники</b><small>Разрешение системы</small></div><div class="val">Есть</div></div>
+                <div class="row-item"><div class="ico">🌙</div><div class="txt"><b>Тихие часы</b><small>23:00 – 07:00</small></div><div class="switch"><i></i></div></div>
+              </div>
+              <div class="group-label">Данные</div>
+              <div class="panel">
+                <div class="row-item"><div class="ico">☁</div><div class="txt"><b>Синхронизация</b><small>Firestore · 2 мин назад</small></div><div class="val">ОК</div></div>
+                <div class="row-item"><div class="ico">⤓</div><div class="txt"><b>Экспорт</b><small>JSON или CSV</small></div><div class="val">›</div></div>
+              </div>
+            </div>
+            <div class="nav">
+              <a href="#"><span class="dot">⌂</span>Главная</a>
+              <a href="#"><span class="dot">◫</span>Лекарства</a>
+              <a href="#"><span class="dot">◎</span>Привычки</a>
+              <a href="#"><span class="dot">☾</span>Сон</a>
+              <a class="on" href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DARK ROW (clone) -->
+  <div class="sec">
+    <div class="sec-head"><span class="num">02</span><h2>Главные экраны · Dark</h2><span class="line"></span><span class="note">те же экраны, другая светимость</span></div>
+    <div class="frames" id="darkRow"></div>
+  </div>
+
+  <!-- FLOWS -->
+  <div class="sec">
+    <div class="sec-head"><span class="num">03</span><h2>Флоу · светлая</h2><span class="line"></span><span class="note">добавление и вход</span></div>
+    <div class="frames">
+
+      <div class="slot">
+        <div class="label"><i></i>Добавление лекарства</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen with-actions">
+              <div class="nav-inline"><div class="back">‹</div><h2>Новое лекарство</h2></div>
+              <div class="field"><label>Название</label><div class="input">Витамин D</div></div>
+              <div class="field">
+                <label>Доза</label>
+                <div class="input">1 <span class="hint">таблетка</span></div>
+                <div class="seg"><span class="on">таб.</span><span>мг</span><span>мл</span><span>кап.</span></div>
+              </div>
+              <div class="field">
+                <label>Время приёма</label>
+                <div class="time-row"><div class="time-slot">09:00 <small>утро</small></div><div class="time-slot">21:00 <small>вечер</small></div><div class="time-slot add">＋ добавить</div></div>
+              </div>
+              <div class="field">
+                <label>Дни</label>
+                <div class="days"><div class="day on">Пн</div><div class="day on">Вт</div><div class="day on">Ср</div><div class="day on">Чт</div><div class="day on">Пт</div><div class="day">Сб</div><div class="day">Вс</div></div>
+              </div>
+              <div class="field"><label>Заметка</label><div class="note">Например: принимать после еды</div></div>
+            </div>
+            <div class="actions"><div class="btn ghost">✕</div><div class="btn primary">Сохранить</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot">
+        <div class="label"><i></i>Вход</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="auth">
+                <div class="logo">🌿</div>
+                <h1>С возвращением</h1>
+                <p>Войдите, чтобы лекарства и привычки синхронизировались между устройствами.</p>
+                <div class="field"><label>Email</label><div class="input">aliya@mail.com</div></div>
+                <div class="field"><label>Пароль</label><div class="input">•••••••• <span class="hint">показать</span></div></div>
+                <div class="btn primary">Войти</div>
+                <div class="divider">или</div>
+                <div class="btn-google"><span>G</span> Продолжить с Google</div>
+                <div class="foot">Нет аккаунта? <b>Создать</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slot">
+        <div class="label"><i></i>Состояния</div>
+        <div class="box">
+          <div class="phone light">
+            <div class="notch"></div>
+            <div class="status"><span>9:41</span><span class="icons">▲ ▮ ▰</span></div>
+            <div class="screen">
+              <div class="topbar"><h2>Состояния</h2></div>
+              <div class="group-label">Пусто</div>
+              <div class="panel" style="padding:22px;text-align:center">
+                <div style="font-size:30px">💊</div>
+                <div style="font-size:14px;font-weight:700;margin-top:8px">Пока нет лекарств</div>
+                <div style="font-size:11.5px;color:var(--muted);margin-top:4px">Добавьте первое — напомним вовремя</div>
+                <div class="btn primary" style="height:44px;font-size:13px;margin-top:14px">Добавить</div>
+              </div>
+              <div class="group-label">Ошибка</div>
+              <div class="panel" style="padding:18px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="font-size:18px">⚠️</div>
+                  <div><b style="font-size:13px">Не удалось загрузить</b><div style="font-size:11.5px;color:var(--muted);margin-top:3px">Проверьте сеть и попробуйте снова</div></div>
+                </div>
+                <div class="btn ghost" style="height:40px;font-size:12.5px;margin-top:12px;flex:none">Повторить</div>
+              </div>
+              <div class="group-label">Загрузка</div>
+              <div class="panel" style="padding:16px">
+                <div class="skeleton" style="height:14px;width:60%"></div>
+                <div class="skeleton" style="height:12px;width:90%;margin-top:9px"></div>
+                <div class="skeleton" style="height:12px;width:75%;margin-top:7px"></div>
+              </div>
+            </div>
+            <div class="nav">
+              <a href="#"><span class="dot">⌂</span>Главная</a>
+              <a class="on" href="#"><span class="dot">◫</span>Лекарства</a>
+              <a href="#"><span class="dot">◎</span>Привычки</a>
+              <a href="#"><span class="dot">☾</span>Сон</a>
+              <a href="#"><span class="dot">⚙</span>Ещё</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOKENS -->
+  <div class="sec">
+    <div class="sec-head"><span class="num">04</span><h2>Токены и правила</h2><span class="line"></span><span class="note">переносится в :core:ui</span></div>
+    <div class="tokens">
+      <div class="tok"><span class="sw" style="background:#4F7C63"></span><span class="tx"><b>Primary</b><small>#4F7C63</small></span></div>
+      <div class="tok"><span class="sw" style="background:#3C6350"></span><span class="tx"><b>Primary dark</b><small>#3C6350</small></span></div>
+      <div class="tok"><span class="sw" style="background:#8FC3A6"></span><span class="tx"><b>Primary (dark theme)</b><small>#8FC3A6</small></span></div>
+      <div class="tok"><span class="sw" style="background:#F7F4EE"></span><span class="tx"><b>Surface</b><small>#F7F4EE</small></span></div>
+      <div class="tok"><span class="sw" style="background:#18201B"></span><span class="tx"><b>Surface dark</b><small>#18201B</small></span></div>
+      <div class="tok"><span class="sw" style="background:#E39A6E"></span><span class="tx"><b>Accent warm</b><small>#E39A6E</small></span></div>
+      <div class="tok"><span class="sw" style="background:#1C2B24"></span><span class="tx"><b>Ink</b><small>#1C2B24</small></span></div>
+      <div class="tok"><span class="sw" style="background:linear-gradient(135deg,#DCE8E0,#A9C7B7)"></span><span class="tx"><b>Soft green</b><small>#E3EFE7</small></span></div>
+      <div class="type">
+        <div class="t1">Заголовок 27 / 700</div>
+        <div class="t2">Основной текст 13.5 / 400 · межстрочный 1.5</div>
+        <div class="t3">Подпись 10.5 / 700 · uppercase · tracking .12em</div>
+      </div>
+    </div>
+    <p class="foot-note"><b>Сетка:</b> базовый шаг 4, рабочие отступы 8 / 12 / 16 / 24. Радиусы: чипы 999, поля 15, карточки 18–20, крупные блоки 24–26. Тени только у плавающих элементов (FAB, нижняя навигация). <b>Доступность:</b> контраст текста ≥ 4.5:1, тач-таргеты ≥ 48dp.</p>
+  </div>
+
+</div>
+
+<script>
+  // Клонируем светлый ряд в тёмный и переключаем тему — чтобы не дублировать разметку.
+  (function () {
+    var light = document.getElementById('lightRow');
+    var dark = document.getElementById('darkRow');
+    dark.innerHTML = light.innerHTML;
+    Array.prototype.forEach.call(dark.querySelectorAll('.phone'), function (p) {
+      p.classList.remove('light');
+      p.classList.add('dark');
+    });
+  })();
+</script>
+</body>
+</html>
