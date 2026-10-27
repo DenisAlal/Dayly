@@ -41,10 +41,12 @@ fun DaylyTheme(
         } else {
             DaylyDisabledColors(DaylyDisabledLight, DaylyDisabledLightContent)
         },
+        LocalSpacing provides DaylySpacing(),
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = DaylyShapes,
             content = content,
         )
     }

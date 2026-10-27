@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
  * Surface   #F7F4EE  (тёплый песок)     #0F1512  (ночной фон)
  * Card      #FFFFFF                     #18201B  (приподнятая поверхность)
  * Ink       #1C2B24                     #E9F0EA
- * Muted     #6E7C74                     #93A399
+ * Muted     #64726A                     #93A399
  * Primary   #4F7C63                     #8FC3A6  (светлее — иначе не хватает контраста)
  * Secondary #3C6350                     #A9C7B7
  * Accent    #E39A6E  (тёплый)           #E8A87C
@@ -26,13 +26,11 @@ val DaylySageSoft = Color(0xFFE3EFE7)
 val DaylySageGhost = Color(0xFFF0F6F2)
 val DaylyCream = Color(0xFFF7F4EE)
 val DaylyInk = Color(0xFF1C2B24)
-val DaylyStone = Color(0xFF6E7C74)
+val DaylyStone = Color(0xFF64726A)
 val DaylySand = Color(0xFFE7E1D7)
 val DaylyWarm = Color(0xFFE39A6E)
-
 val DaylyDisabledLight = Color(0xFFD8E3DB)
-
-val DaylyDisabledLightContent = Color(0xFF57675D)
+val DaylyDisabledLightContent = Color(0xFF4E5C53)
 
 // --- тёмная палитра ---------------------------------------------------------
 
@@ -42,11 +40,9 @@ val DaylyNight = Color(0xFF0F1512)
 val DaylyNightSurface = Color(0xFF18201B)
 val DaylyNightElevated = Color(0xFF1F2A23)
 val DaylyNightLine = Color(0xFF29332C)
-val DaylyMist = Color(0xFF93A399)
+val DaylyMist = Color(0xFF18201B)
 val DaylySnow = Color(0xFFE9F0EA)
-
 val DaylyDisabledDark = Color(0xFF27362D)
-
 val DaylyDisabledDarkContent = Color(0xFF9DB0A4)
 
 // --- схемы ------------------------------------------------------------------

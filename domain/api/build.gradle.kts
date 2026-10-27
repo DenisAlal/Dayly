@@ -3,7 +3,6 @@ plugins {
     id("java-library")
 }
 
-// Чистый Kotlin: без Android. Конфигурация api доступна благодаря java-library.
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -16,9 +15,9 @@ kotlin {
 }
 
 dependencies {
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
-    testImplementation("junit:junit:4.13.2")
+    api(libs.kotlinx.coroutines.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
     testImplementation(kotlin("test"))
 }
 

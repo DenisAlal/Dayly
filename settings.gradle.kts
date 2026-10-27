@@ -27,3 +27,4 @@ include(":app")
 
 include(":core:ui")
 include(":domain:api")
+include(":feature:medications")
