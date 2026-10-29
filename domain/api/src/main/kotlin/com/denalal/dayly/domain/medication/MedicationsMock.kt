@@ -1,4 +1,4 @@
-package com.denalal.dayly.feature.medications
+package com.denalal.dayly.domain.medication
 
 import com.denalal.dayly.domain.medication.model.Dose
 import com.denalal.dayly.domain.medication.model.DoseUnit

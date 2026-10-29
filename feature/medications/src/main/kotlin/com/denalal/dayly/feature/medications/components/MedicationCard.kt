@@ -16,7 +16,7 @@ import com.denalal.dayly.core.ui.theme.LocalSpacing
 import com.denalal.dayly.domain.medication.model.Medication
 import com.denalal.dayly.domain.medication.model.format
 import com.denalal.dayly.domain.medication.model.sortedTimes
-import com.denalal.dayly.feature.medications.MockMedications
+import com.denalal.dayly.domain.medication.MockMedications
 
 @Composable
 fun MedicationCard(

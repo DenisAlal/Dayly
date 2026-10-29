@@ -23,16 +23,26 @@ import com.denalal.dayly.core.ui.theme.LocalSpacing
 fun DaylyCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val spacing = LocalSpacing.current
-
     val colors = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
     )
     val shape = MaterialTheme.shapes.large
     val border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+
+    val body: @Composable () -> Unit = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.lg),
+            horizontalAlignment = horizontalAlignment,
+            content = content,
+        )
+    }
 
     if (onClick != null) {
         Card(
@@ -42,9 +52,7 @@ fun DaylyCard(
             colors = colors,
             border = border,
         ) {
-            Column(Modifier.padding(spacing.lg)) {
-                content()
-            }
+            body()
         }
     } else {
         Card(
@@ -53,9 +61,7 @@ fun DaylyCard(
             colors = colors,
             border = border,
         ) {
-            Column(Modifier.padding(spacing.lg)) {
-                content()
-            }
+            body()
         }
     }
 }

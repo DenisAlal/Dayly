@@ -5,8 +5,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FakeMedicationRepository : MedicationRepository {
+@Singleton
+class FakeMedicationRepository @Inject constructor() : MedicationRepository {
     private val state = MutableStateFlow<List<Medication>>(emptyList())
     private val taken = mutableListOf<String>()
 

@@ -1,6 +1,5 @@
 package com.denalal.dayly.core.ui.component
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import com.denalal.dayly.core.ui.theme.DaylyTheme
 @Composable
 fun DaylyPreview(
     darkTheme: Boolean = false,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Center,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -29,7 +27,6 @@ fun DaylyPreview(
                 modifier = Modifier
                     .fillMaxSize()
                     .safeDrawingPadding(),
-                verticalArrangement = verticalArrangement,
                 horizontalAlignment = horizontalAlignment,
                 content = content,
             )
